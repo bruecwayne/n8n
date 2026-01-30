@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "n8n-mcp": {
+      "command": "npx",
+      "args": ["-y", "n8n-mcp"],
+      "env": {
+        "MCP_MODE": "stdio",
+        "N8N_API_URL": "https://excelimpact.app.n8n.cloud/api/v1",
+        "N8N_API_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2Yjg1ZmVhMy01NmFkLTRjYzEtYTI1OC0xN2Q0ODVjODczZTUiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzY5NzQ5MjI0LCJleHAiOjE3Nzc1MjE2MDB9.8IIUZ87szW9ZI8BJ_VYETc-ONyeSK56oGENeST_rDdg"
+      }
+    }
+  }
+}
