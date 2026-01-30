@@ -1,6 +1,7 @@
 {
   "mcpServers": {
     "n8n-mcp": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "n8n-mcp"],
       "env": {
