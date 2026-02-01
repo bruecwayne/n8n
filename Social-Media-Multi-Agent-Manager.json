@@ -1,0 +1,963 @@
+{
+  "meta": {
+    "instanceId": "social-media-multi-agent-system",
+    "templateCredsSetupCompleted": true
+  },
+  "nodes": [
+    {
+      "id": "master-manager-agent",
+      "name": "🧠 Master Manager Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [400, 300],
+      "parameters": {
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "You are a Social Media Manager AI that delegates tasks to specialized agents. Analyze the user's request and decide which agent(s) to use:\n\n🎨 ContentCreator: For captions, hashtags, post ideas, TikTok scripts, creative content\n📧 EmailOutreach: For PR emails, brand partnerships, collaboration outreach, local business contact\n📱 PlatformManager: For posting content across platforms, scheduling, cross-platform distribution\n📊 AnalyticsAgent: For performance metrics, engagement analysis, growth tracking, ROI reports\n💬 CommunityManager: For responding to comments, managing DMs, community engagement\n\nChoose the most appropriate agent(s) and send clear, specific instructions to them. You can use multiple agents for complex requests."
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "content-creator-agent",
+      "name": "🎨 ContentCreator Agent",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "position": [800, 100],
+      "parameters": {
+        "text": "={{ $fromAI('Content_Request', '', 'string') }}",
+        "options": {
+          "systemMessage": "You are a Creative Content Specialist focused on social media content creation. You excel at:\n\n✨ TikTok Scripts: Engaging hooks, trending formats, viral potential\n📸 Instagram Captions: Brand voice, storytelling, call-to-actions\n🏷️ Hashtag Research: Trending tags, niche communities, reach optimization\n💡 Content Ideas: Trending topics, seasonal content, brand storytelling\n🎬 Video Concepts: Storyboards, shot lists, engagement tactics\n\nAlways consider:\n- Platform-specific best practices\n- Current trends and viral formats\n- Brand voice consistency\n- Engagement optimization\n- Hashtag strategy (mix of trending, niche, and branded)\n\nProvide complete, actionable content ready for immediate use."
+        },
+        "toolDescription": "Creates engaging social media content including captions, hashtags, video scripts, and post ideas optimized for different platforms"
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "email-outreach-agent",
+      "name": "📧 EmailOutreach Agent",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "position": [800, 300],
+      "parameters": {
+        "text": "={{ $fromAI('Email_Request', '', 'string') }}",
+        "options": {
+          "systemMessage": "You are a Professional PR & Partnership Specialist. You craft compelling outreach emails for:\n\n🤝 Brand Partnerships: Collaboration proposals, sponsorship pitches\n🏢 Local Business Outreach: Restaurant partnerships, local brand deals\n📝 PR Communications: Product launches, media relations, press inquiries\n💼 Follow-up Sequences: Professional, persistent without being pushy\n📊 Performance Tracking: Subject line optimization, response rate improvement\n\nEmail Structure Expertise:\n- Compelling subject lines\n- Personalized openings\n- Clear value propositions\n- Professional yet warm tone\n- Strong call-to-actions\n- Follow-up strategies\n\nInclude specific details like rates, deliverables, timelines, and mutual benefits. Always maintain professionalism while showing personality."
+        },
+        "toolDescription": "Handles all email outreach for PR, brand partnerships, collaborations, and local business relationships"
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "platform-manager-agent",
+      "name": "📱 PlatformManager Agent",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "position": [800, 500],
+      "parameters": {
+        "text": "={{ $fromAI('Platform_Request', '', 'string') }}",
+        "options": {
+          "systemMessage": "You are a Multi-Platform Distribution Specialist managing content across all social media platforms. You handle:\n\n📱 TikTok: Short-form videos, trending sounds, hashtag challenges\n📸 Instagram: Posts, Stories, Reels, IGTV optimization\n🐦 Twitter: Thread creation, trending topics, real-time engagement\n💼 LinkedIn: Professional content, thought leadership, networking\n📌 Pinterest: Visual discovery, SEO optimization, board strategy\n🎵 YouTube: Long-form content, shorts, community posts\n\nPlatform Optimization:\n- Format adaptation (aspect ratios, lengths, styles)\n- Timing optimization (best posting times per platform)\n- Cross-platform content repurposing\n- Platform-specific features utilization\n- Scheduling and automation setup\n\nProvide specific posting instructions, optimal times, and platform-adapted content versions."
+        },
+        "toolDescription": "Manages content distribution across multiple social media platforms with platform-specific optimization"
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "analytics-agent",
+      "name": "📊 AnalyticsAgent",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "position": [800, 700],
+      "parameters": {
+        "text": "={{ $fromAI('Analytics_Request', '', 'string') }}",
+        "options": {
+          "systemMessage": "You are a Social Media Analytics & Growth Specialist. You provide data-driven insights for:\n\n📈 Performance Metrics: Engagement rates, reach, impressions, growth\n💰 ROI Analysis: Revenue from partnerships, cost per engagement, conversion tracking\n🎯 Audience Insights: Demographics, behavior patterns, optimal content types\n📊 Competitive Analysis: Benchmarking, industry trends, opportunity identification\n🔍 Content Analysis: Top performing posts, viral factors, optimization opportunities\n📅 Growth Strategy: Monthly goals, KPI tracking, strategic recommendations\n\nAnalytics Focus Areas:\n- Engagement rate optimization\n- Follower growth patterns\n- Content performance ranking\n- Brand partnership ROI\n- Platform-specific metrics\n- Trend identification and forecasting\n\nProvide actionable insights with specific recommendations for improvement and growth."
+        },
+        "toolDescription": "Analyzes social media performance, tracks metrics, and provides data-driven growth recommendations"
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "community-manager-agent",
+      "name": "💬 CommunityManager Agent",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "position": [800, 900],
+      "parameters": {
+        "text": "={{ $fromAI('Community_Request', '', 'string') }}",
+        "options": {
+          "systemMessage": "You are a Community Engagement & Relationship Specialist. You manage all fan interactions including:\n\n💬 Comment Management: Thoughtful responses, engagement boosting, conversation starters\n📩 DM Responses: Personal connection, customer service, partnership inquiries\n🤝 Fan Engagement: Building loyalty, creating community, user-generated content\n🛡️ Crisis Management: Negative feedback handling, reputation protection\n🎉 Community Building: Events, challenges, fan appreciation, exclusive content\n🔔 Notification Management: Priority identification, response timing, escalation protocols\n\nEngagement Strategies:\n- Authentic, personality-driven responses\n- Quick response times for time-sensitive content\n- Community challenge creation\n- Fan spotlight and appreciation\n- Brand voice consistency across all interactions\n- Relationship building with loyal followers\n\nMaintain warm, genuine interactions while protecting brand reputation and building strong community relationships."
+        },
+        "toolDescription": "Manages community engagement, responds to comments and DMs, and builds strong follower relationships"
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "master-openai-model",
+      "name": "🧠 Master OpenAI Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [200, 300],
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 2000
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-main-account",
+          "name": "OpenAI Main Account"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "content-openai-model",
+      "name": "🎨 Content OpenAI Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [600, 100],
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {
+          "temperature": 0.9,
+          "maxTokens": 1500
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-main-account",
+          "name": "OpenAI Main Account"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "email-openai-model",
+      "name": "📧 Email OpenAI Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [600, 300],
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0.6,
+          "maxTokens": 1000
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-main-account",
+          "name": "OpenAI Main Account"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "platform-openai-model",
+      "name": "📱 Platform OpenAI Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [600, 500],
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0.5,
+          "maxTokens": 1200
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-main-account",
+          "name": "OpenAI Main Account"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "analytics-openai-model",
+      "name": "📊 Analytics OpenAI Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [600, 700],
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0.3,
+          "maxTokens": 1500
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-main-account",
+          "name": "OpenAI Main Account"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "community-openai-model",
+      "name": "💬 Community OpenAI Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [600, 900],
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0.8,
+          "maxTokens": 800
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-main-account",
+          "name": "OpenAI Main Account"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "master-memory",
+      "name": "🧠 Master Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [200, 400],
+      "parameters": {
+        "windowSize": 10
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "content-memory",
+      "name": "🎨 Content Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [600, 200],
+      "parameters": {
+        "windowSize": 8
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "email-memory",
+      "name": "📧 Email Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [600, 400],
+      "parameters": {
+        "windowSize": 6
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "platform-memory",
+      "name": "📱 Platform Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [600, 600],
+      "parameters": {
+        "windowSize": 6
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "analytics-memory",
+      "name": "📊 Analytics Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [600, 800],
+      "parameters": {
+        "windowSize": 8
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "community-memory",
+      "name": "💬 Community Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [600, 1000],
+      "parameters": {
+        "windowSize": 10
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "gmail-integration",
+      "name": "📧 Gmail Integration",
+      "type": "n8n-nodes-base.gmail",
+      "position": [1000, 300],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "simple": false,
+        "sendTo": "={{ $json.recipientEmail }}",
+        "subject": "={{ $json.emailSubject }}",
+        "body": "={{ $json.emailBody }}"
+      },
+      "credentials": {
+        "googleApi": {
+          "id": "gmail-account",
+          "name": "Gmail Account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "slack-notification",
+      "name": "📱 Slack Notifications",
+      "type": "n8n-nodes-base.slack",
+      "position": [1000, 500],
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "channel": "#social-media-updates",
+        "text": "🚀 Social Media Task Completed:\n\n📝 **Task**: {{ $json.taskType }}\n✅ **Status**: {{ $json.status }}\n📊 **Details**: {{ $json.summary }}\n\n🔗 **Action**: {{ $json.nextSteps }}"
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "slack-workspace",
+          "name": "Slack Workspace"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "analytics-sheets",
+      "name": "📊 Analytics Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [1000, 700],
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": "{{ $json.analyticsSheetId }}",
+        "sheetName": "Social Media Analytics",
+        "columnToMatchOn": "Date",
+        "valueToMatchOn": "={{ new Date().toISOString().split('T')[0] }}",
+        "options": {
+          "useAppend": true
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-account",
+          "name": "Google Sheets Account"
+        }
+      },
+      "typeVersion": 4.4
+    },
+    {
+      "id": "webhook-trigger",
+      "name": "🎯 Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "position": [100, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "social-media-manager",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "manual-trigger",
+      "name": "▶️ Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [100, 200],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "response-handler",
+      "name": "📤 Response Handler",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1200, 300],
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        },
+        "respondBody": "{\n  \"success\": true,\n  \"message\": \"Social media task completed successfully\",\n  \"taskId\": \"{{ $json.taskId }}\",\n  \"agent\": \"{{ $json.agentUsed }}\",\n  \"result\": \"{{ $json.response }}\",\n  \"timestamp\": \"{{ new Date().toISOString() }}\"\n}"
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "tiktok-integration",
+      "name": "📱 TikTok Integration",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1000, 100],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tiktok.com/v1/post/",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "caption",
+              "value": "={{ $json.caption }}"
+            },
+            {
+              "name": "video_url",
+              "value": "={{ $json.videoUrl }}"
+            },
+            {
+              "name": "hashtags",
+              "value": "={{ $json.hashtags }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxTries": 3
+          }
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "tiktok-api-key",
+          "name": "TikTok API Key"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "instagram-integration",
+      "name": "📸 Instagram Integration",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1000, 150],
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v18.0/{{ $json.instagramAccountId }}/media",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image_url",
+              "value": "={{ $json.imageUrl }}"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $json.caption }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $json.accessToken }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxTries": 3
+          }
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "instagram-api-key",
+          "name": "Instagram API Key"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "local-business-finder",
+      "name": "🏪 Local Business Finder",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1000, 400],
+      "parameters": {
+        "method": "GET",
+        "url": "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "location",
+              "value": "={{ $json.latitude }},{{ $json.longitude }}"
+            },
+            {
+              "name": "radius",
+              "value": "5000"
+            },
+            {
+              "name": "type",
+              "value": "restaurant"
+            },
+            {
+              "name": "keyword",
+              "value": "{{ $json.businessType || 'restaurant' }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "google-maps-api",
+          "name": "Google Maps API"
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "documentation-note",
+      "name": "📚 Usage Guide",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-200, 100],
+      "parameters": {
+        "color": 5,
+        "width": 400,
+        "height": 800,
+        "content": "# 🎯 **Social Media Multi-Agent System**\n\n## **🚀 Quick Start**\n\n### **Manual Trigger Usage:**\n```json\n{\n  \"query\": \"Create a TikTok script about morning routine\",\n  \"context\": {\n    \"brand\": \"Lifestyle Influencer\",\n    \"audience\": \"Gen Z\",\n    \"goal\": \"engagement\"\n  }\n}\n```\n\n### **Webhook Usage:**\n```bash\ncurl -X POST https://your-n8n.com/webhook/social-media-manager \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"query\": \"Send PR email to local restaurants\",\n    \"location\": \"New York\",\n    \"type\": \"collaboration\"\n  }'\n```\n\n## **🎨 Agent Capabilities**\n\n**ContentCreator:** Captions, hashtags, video scripts\n**EmailOutreach:** PR emails, partnerships, follow-ups\n**PlatformManager:** Multi-platform posting, scheduling\n**AnalyticsAgent:** Performance tracking, insights\n**CommunityManager:** Engagement, responses, moderation\n\n## **📱 Example Requests**\n\n- \"Create Instagram post about new product launch\"\n- \"Find local coffee shops for collaboration\"\n- \"Analyze last week's TikTok performance\"\n- \"Respond to recent comments on viral video\"\n- \"Schedule posts across all platforms\"\n\n## **🔧 Setup Requirements**\n\n1. **OpenAI API Key** - For all AI agents\n2. **Gmail OAuth** - For email outreach\n3. **Slack Webhook** - For notifications\n4. **Google Sheets** - For analytics tracking\n5. **Social Media APIs** - Platform integrations\n6. **Google Maps API** - Local business discovery\n\n## **💡 Pro Tips**\n\n- Be specific in requests for better results\n- Include brand voice guidelines in context\n- Use location data for local business outreach\n- Review AI-generated content before publishing\n- Monitor analytics regularly for optimization"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "webhook-trigger": {
+      "main": [
+        [
+          {
+            "node": "master-manager-agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "manual-trigger": {
+      "main": [
+        [
+          {
+            "node": "master-manager-agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "master-openai-model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "master-manager-agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "content-openai-model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "content-creator-agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "email-openai-model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "email-outreach-agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "platform-openai-model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "platform-manager-agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "analytics-openai-model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "analytics-agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "community-openai-model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "community-manager-agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "master-memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "master-manager-agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "content-memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "content-creator-agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "email-memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "email-outreach-agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "platform-memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "platform-manager-agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "analytics-memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "analytics-agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "community-memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "community-manager-agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "content-creator-agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "master-manager-agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "tiktok-integration",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "instagram-integration",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "slack-notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "email-outreach-agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "master-manager-agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "gmail-integration",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "local-business-finder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "slack-notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "platform-manager-agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "master-manager-agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "tiktok-integration",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "instagram-integration",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "slack-notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "analytics-agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "master-manager-agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "analytics-sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "slack-notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "community-manager-agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "master-manager-agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "slack-notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "master-manager-agent": {
+      "main": [
+        [
+          {
+            "node": "response-handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gmail-integration": {
+      "main": [
+        [
+          {
+            "node": "response-handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "slack-notification": {
+      "main": [
+        [
+          {
+            "node": "response-handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "analytics-sheets": {
+      "main": [
+        [
+          {
+            "node": "response-handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tiktok-integration": {
+      "main": [
+        [
+          {
+            "node": "response-handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "instagram-integration": {
+      "main": [
+        [
+          {
+            "node": "response-handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "local-business-finder": {
+      "main": [
+        [
+          {
+            "node": "response-handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": {
+      "onError": "continueRegularOutput"
+    }
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "social-media",
+      "name": "Social Media"
+    },
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "ai-agents",
+      "name": "AI Agents"
+    },
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "multi-agent",
+      "name": "Multi-Agent"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}

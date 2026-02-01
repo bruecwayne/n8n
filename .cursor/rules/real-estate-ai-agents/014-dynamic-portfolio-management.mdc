@@ -1,0 +1,33 @@
+---
+description: Reinforcement learning-based real estate portfolio optimization and market timing
+globs: real-estate-ai-literature-review/Dynamic-Portfolio-Management-Agent.json,real-estate-ai-literature-review/Additional-Agent-Workflow-Descriptions.md
+alwaysApply: false
+---
+
+## Reinforcement Learning Portfolio Optimization
+
+### Continuous Learning Framework
+- **State Assessment**: Evaluate current portfolio against benchmarks and target allocations
+- **Market Intelligence**: Gather real-time data from CoStar, REIS, Zillow, and Federal Reserve APIs
+- **Opportunity Scanning**: Identify off-market deals, distressed assets, and development opportunities
+- **Risk Evaluation**: Run Monte Carlo simulations and stress testing scenarios
+- **Action Selection**: Generate optimal buy/sell/hold recommendations with timing optimization
+
+### Decision-Making Tools
+- **Performance Analytics**: Calculate IRR, Sharpe ratios, alpha generation, and risk metrics
+- **Cost Optimization**: Estimate transaction costs, bid-ask spreads, and market impact
+- **Rebalancing Engine**: Execute optimal portfolio adjustments with tax-loss harvesting
+- **Stress Testing**: Run climate risk integration and interest rate sensitivity analysis
+
+### Portfolio Management Objectives
+- **Risk-Adjusted Returns**: Maximize returns while maintaining target risk profiles
+- **Cost Efficiency**: Minimize transaction costs and tax impacts through optimal timing
+- **Market Adaptation**: Respond to changing market conditions in real-time
+- **Liquidity Management**: Balance illiquid real estate holdings with market opportunities
+
+### Institutional Investor Focus
+- **Target Stakeholders**: Pension funds, endowments, sovereign wealth funds, family offices
+- **Value Proposition**: Enable continuous optimization in illiquid markets beyond quarterly rebalancing
+- **Performance Metrics**: Track alpha generation, risk-adjusted returns, and market timing accuracy
+
+@real-estate-ai-literature-review/Dynamic-Portfolio-Management-Agent.json

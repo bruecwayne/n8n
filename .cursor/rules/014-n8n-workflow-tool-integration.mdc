@@ -1,0 +1,52 @@
+---
+description: Tool integration patterns and code tool implementation for n8n workflows
+globs: real-estate-ai-literature-review/*.json,workflows/*.json
+alwaysApply: false
+---
+
+## Tool Integration Patterns
+
+### Code Tool Implementation
+- Use Python for complex calculations, data processing, and algorithmic implementations
+- Structure code tools with proper function definitions, input validation, and error handling
+- Implement schema validation with inputSchema definitions for type safety and parameter validation
+- Return structured data (dictionaries/JSON) from code tools for consistent agent parsing
+
+### HTTP Request Tool Configuration
+- Configure HTTP request tools with proper authentication and header management
+- Use sendQuery: true with structured query parameters for API integrations
+- Implement error handling and response optimization with optimizeResponse: true
+- Set appropriate timeouts and retry logic for external service dependencies
+
+### Vector Store Integration
+- Use Pinecone or similar vector databases for RAG implementations with embeddings
+- Configure vector store tools with appropriate similarity search parameters
+- Connect embeddings models (Google Gemini, OpenAI) to vector stores for document retrieval
+- Implement chunking strategies and indexing for optimal retrieval performance
+
+### Workflow Tool Patterns
+- Use @n8n/n8n-nodes-langchain.toolWorkflow for agent-to-workflow communication
+- Implement sub-workflow execution patterns for complex multi-step processes
+- Maintain consistent parameter passing and result handling across workflow boundaries
+- Design modular workflow tools that can be reused across different agent architectures
+
+### Dynamic Parameter Handling
+- Use $fromAI() expressions for dynamic parameter generation based on agent reasoning
+- Implement conditional logic and fallback mechanisms in tool parameter configuration
+- Handle API key management through environment variables and credential references
+- Create flexible tool interfaces that adapt to different input scenarios
+
+### Error Handling and Validation
+- Implement comprehensive error handling in code tools with meaningful error messages
+- Use try-catch blocks and input validation to prevent runtime failures
+- Provide fallback responses when tools are unavailable or return unexpected results
+- Log errors appropriately while maintaining user-friendly error responses
+
+### Performance Optimization
+- Configure appropriate token limits and model parameters for cost-effective operation
+- Implement caching strategies for frequently accessed data and computations
+- Use batch processing patterns for multiple similar operations
+- Monitor and optimize tool execution times for responsive workflow performance
+
+@real-estate-ai-literature-review/RAG-AI-Agent.json
+@real-estate-ai-literature-review/Multi-Modal-Real-Estate-Assessment-Agent.json

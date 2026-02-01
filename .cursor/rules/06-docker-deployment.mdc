@@ -1,0 +1,52 @@
+---
+description: Workflow deployment strategies and environment management for development and production
+globs: Dockerfile,docker-compose.yml,run-as-docker-container.sh,run.py
+alwaysApply: false
+---
+
+## Development Environments
+
+### Local Setup
+- **Docker Compose**: Complete development environment with database persistence
+- **Volume Mounting**: Mount workflow directories for real-time development
+- **Hot Reloading**: Auto-restart for code changes during development
+- **Database Persistence**: SQLite database across container restarts
+
+### Multi-Environment Deployment
+- **Development**: Full debugging, hot reload, comprehensive logging
+- **Staging**: Production-like environment for integration testing
+- **Production**: Optimized images, health checks, monitoring, automated deployments
+
+### Testing Environments
+- **Isolated Testing**: Individual workflows in containers for safe testing
+- **Integration Testing**: Multi-workflow interactions using Docker networks
+- **Load Testing**: Scale containers for performance testing
+- **CI/CD Integration**: Automated testing with consistent environments
+
+### Containerized Patterns
+- **Single Containers**: Individual workflows in dedicated containers
+- **Multi-Agent Containers**: Orchestrated workflows with proper networking
+- **Service Mesh**: Docker networks for webhook communication
+- **Resource Management**: CPU/memory limits based on complexity
+
+### Deployment Best Practices
+- **Blue-Green**: Zero-downtime deployments for critical workflows
+- **Rolling Updates**: Gradual rollout to minimize disruption
+- **Rollback Strategies**: Quick rollback with previous versions
+- **Health Monitoring**: Comprehensive health checks for containers
+
+### Configuration
+- **Environment Variables**: API keys, database paths, service endpoints
+- **Secret Management**: Secure credential handling for production
+- **Config Files**: Separate files for dev/staging/prod environments
+- **Runtime Config**: Configuration changes without rebuilds
+
+### Monitoring
+- **Container Logs**: Centralized workflow execution logs
+- **Performance Metrics**: Resource usage and execution times
+- **Health Endpoints**: Availability and responsiveness checks
+- **Alerting**: Alerts for failures, high usage, errors
+
+@Dockerfile
+@docker-compose.yml
+@run-as-docker-container.sh

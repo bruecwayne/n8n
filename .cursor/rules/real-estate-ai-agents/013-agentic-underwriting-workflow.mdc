@@ -1,0 +1,36 @@
+---
+description: Multi-agent commercial real estate underwriting and due diligence orchestration
+globs: real-estate-ai-literature-review/Agentic-Underwriting-Workflow.json,real-estate-ai-literature-review/Additional-Agent-Workflow-Descriptions.md
+alwaysApply: false
+---
+
+## Multi-Agent Underwriting Orchestration
+
+### Agent Hierarchy Design
+- **Master Orchestrator**: Coordinates entire underwriting process and manages agent handoffs
+- **Document Parser Agent**: Specializes in lease document analysis and financial term extraction
+- **Financial Modeler Agent**: Builds DCF models, sensitivity analysis, and comparable transactions
+- **Risk Assessor Agent**: Conducts environmental, legal, and market risk evaluations
+- **Report Synthesis Agent**: Compiles comprehensive underwriting memoranda
+- **Quality Assurance Agent**: Performs final validation and audit trail documentation
+
+### Workflow Execution Sequence
+- **Initiation**: Master orchestrator receives underwriting request with property documents
+- **Parallel Processing**: Document parser and risk assessor work simultaneously on initial analysis
+- **Sequential Integration**: Financial modeler uses outputs from first two agents
+- **Synthesis**: Report synthesis agent creates final memorandum
+- **Verification**: Quality assurance agent validates entire package with confidence scoring
+
+### Agent Communication Patterns
+- **Shared Global Memory**: Maintain workflow state across all agents with 20-turn context
+- **Specialized Models**: Use GPT-4 for orchestration, GPT-4o-mini for specialized agent tasks
+- **Tool Integration**: Each agent has dedicated tools for their domain expertise
+- **Error Escalation**: Complex issues automatically escalate to human underwriters
+
+### Underwriting Standards Compliance
+- **Audit Trails**: Maintain complete documentation of agent reasoning and data sources
+- **Confidence Scoring**: Provide quantitative confidence levels for all recommendations
+- **Regulatory Compliance**: Include required disclosures and risk mitigation strategies
+- **Stakeholder Alignment**: Target commercial lenders, institutional investors, and investment banks
+
+@real-estate-ai-literature-review/Agentic-Underwriting-Workflow.json

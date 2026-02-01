@@ -1,0 +1,30 @@
+---
+description: Multi-modal property assessment with image, text, and geospatial analysis
+globs: real-estate-ai-literature-review/Multi-Modal-Real-Estate-Assessment-Agent.json,real-estate-ai-literature-review/Additional-Agent-Workflow-Descriptions.md
+alwaysApply: false
+---
+
+## Multi-Modal Property Assessment Architecture
+
+### Data Integration Strategy
+- **Parallel Processing**: Run image analysis, text extraction, and geospatial data collection simultaneously
+- **Sequential Synthesis**: Feed all collected data into automated valuation model (AVM)
+- **Output Generation**: Create comprehensive PDF reports with confidence scores and comparables
+
+### Tool Configuration Requirements
+- **Image Analysis**: Configure computer vision APIs (Google Vision/OpenAI Vision) for property condition assessment
+- **Text Processing**: Implement NLP for lease document analysis and amenity extraction
+- **Geospatial Tools**: Integrate GIS APIs for location intelligence and neighborhood demographics
+- **Valuation Engine**: Use ensemble ML models combining all data modalities
+
+### Workflow Execution Flow
+- User uploads property data → Parallel analysis tools activate → AVM synthesizes results → Report generator creates deliverables
+- Maintain 20-turn conversation memory for follow-up questions and clarifications
+- Provide confidence intervals and key drivers for all valuations
+
+### Real Estate Application Focus
+- **Target Users**: Appraisers, lenders, real estate investors, property managers
+- **Value Proposition**: Reduce assessment time from days to minutes with improved accuracy
+- **Data Sources**: Satellite imagery, street photos, floor plans, listing descriptions, GIS data
+
+@real-estate-ai-literature-review/Multi-Modal-Real-Estate-Assessment-Agent.json

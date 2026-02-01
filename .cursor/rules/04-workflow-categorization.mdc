@@ -1,0 +1,40 @@
+---
+description: Multi-agent workflow design patterns and orchestration strategies
+globs: real-estate-ai-literature-review/*.json,workflows/*.json
+alwaysApply: false
+---
+
+## Multi-Agent Architecture Patterns
+
+### Orchestrator-Worker Pattern
+- **Master Orchestrator**: ExecuteWorkflow node coordinates specialized agent workflows
+- **Specialized Agents**: Focused workflows for email, calendar, data processing tasks
+- **Communication Layer**: Shared data stores or webhooks for agent coordination
+- **Example**: AI orchestrating research, writing, publishing workflows
+
+### Chain of Thought Workflows
+- **Sequential Processing**: OpenAI nodes with memory buffers for complex reasoning
+- **Iterative Refinement**: Loops for self-improvement cycles
+- **Context Preservation**: Conversation history across agent interactions
+- **Example**: Content creation: research → outline → draft → edit → publish
+
+### Parallel Processing
+- **Concurrent Execution**: Split In Batches for simultaneous agent execution
+- **Result Aggregation**: Merge nodes consolidate parallel outputs
+- **Load Balancing**: Distribute tasks across workflow instances
+- **Example**: Bulk outreach with parallel email agents
+
+### Agent Integration
+- **Tool Nodes**: Specialized nodes like Googlecalendartool, Gmailtool
+- **Function Calling**: OpenAI function calling for real-world actions
+- **API Orchestration**: Multiple API calls with HTTP Request nodes
+- **Example**: Personal assistant coordinating calendar, email, tasks
+
+### Communication Patterns
+- **Shared Memory**: Workflow variables and memory buffers
+- **Webhook Chains**: Event-driven processing between agents
+- **Database Coordination**: Shared databases for agent states
+- **Message Queues**: Redis queuing for reliable communication
+
+@real-estate-ai-literature-review/Multi-agent-workflow-orchestrator.json
+@real-estate-ai-literature-review/AI-Agent.json

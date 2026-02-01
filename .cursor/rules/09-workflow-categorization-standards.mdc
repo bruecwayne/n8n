@@ -1,0 +1,46 @@
+---
+description: Workflow categorization strategies and service mapping for development efficiency
+globs: context/*.json,workflows/*.json,create_categories.py
+alwaysApply: false
+---
+
+## Workflow Categorization
+
+### Primary Classification
+- **AI Agent Development**: AI model orchestration, multi-agent systems (4 workflows)
+- **Business Process Automation**: Calendar scheduling, task management (77 workflows)
+- **Communication & Messaging**: Chatbots, notifications, multi-channel (321 workflows)
+- **Data Processing & Analysis**: ETL pipelines, data transformation (125 workflows)
+- **Web Scraping & Data Extraction**: API integrations, external data collection (264 workflows)
+
+### Service-Based Rules
+- **Google Services**: Sheets/Data → Data Processing, Calendar → Business Process, Drive → Cloud Storage
+- **Communication Tools**: Slack/Discord/Telegram → Communication & Messaging
+- **AI Services**: OpenAI/Anthropic orchestration → AI Agent Development
+- **Development Tools**: GitHub/GitLab → Technical Infrastructure
+
+### Category Optimization
+- **Large Categories**: Communication (321) and Web Scraping (264) could be subdivided
+- **Growing Categories**: Monitor AI Agent and Business Process for subcategories
+- **Consolidation**: Evaluate Data Processing vs Web Scraping overlaps
+
+### Cross-Category Handling
+- **OpenAI**: Orchestration → AI Agent, simple calls → parent category
+- **Google Workspace**: Spread across Data Processing, Business Process, Cloud Storage
+- **HTTP Request**: Generic API calls by primary business function
+
+### Automated Logic
+- **Filename Analysis**: Extract service names using underscore separation
+- **Node Analysis**: Scan workflow JSON for integration nodes and patterns
+- **Priority Rules**: Business function takes precedence over technical implementation
+- **Fallback Logic**: Default to "Uncategorized" when unclear
+
+### Quality Assurance
+- **Manual Review**: Validate automated categorization accuracy
+- **Consistency Checks**: Ensure similar workflows get consistent assignments
+- **Edge Cases**: Rules for workflows spanning multiple functions
+- **Evolution**: Update rules as new integration patterns emerge
+
+@context/def_categories.json
+@Documentation/category-structure.md
+@create_categories.py

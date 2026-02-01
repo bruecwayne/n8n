@@ -1,0 +1,34 @@
+---
+description: Social media multi-agent orchestration and specialized agent coordination
+globs: real-estate-ai-literature-review/Multi-agent-workflow-orchestrator.json
+alwaysApply: false
+---
+
+## Multi-Agent Orchestration Framework
+
+### Orchestrator Agent Design
+- **Task Analysis**: Evaluate user requests and determine appropriate agent delegation
+- **Agent Coordination**: Route tasks to specialized agents based on content type and requirements
+- **Result Synthesis**: Combine outputs from multiple agents into coherent responses
+- **Quality Assurance**: Ensure consistent tone and messaging across all agent interactions
+
+### Specialized Agent Roles
+- **Content Creator**: Handles captions, hashtags, post ideas, and creative content generation
+- **Email Outreach**: Manages PR emails, brand partnerships, and collaboration requests
+- **Platform Manager**: Handles cross-platform posting, scheduling, and format optimization
+- **Analytics Agent**: Provides performance metrics, engagement analysis, and growth insights
+- **Community Manager**: Handles comment responses, DM management, and community engagement
+
+### Agent Communication Patterns
+- **Shared Memory**: Individual memory buffers for each specialized agent
+- **Orchestrator Memory**: Global context for coordinating multiple agent interactions
+- **Webhook Integration**: REST API endpoints for external agent triggering
+- **Response Consolidation**: Unified output formatting across different agent types
+
+### Social Media Workflow Focus
+- **Content Strategy**: Unified brand voice across all social media platforms
+- **Performance Tracking**: Cross-platform analytics and ROI measurement
+- **Community Management**: Consistent engagement and relationship building
+- **Growth Optimization**: Data-driven content and posting strategy improvements
+
+@real-estate-ai-literature-review/Multi-agent-workflow-orchestrator.json

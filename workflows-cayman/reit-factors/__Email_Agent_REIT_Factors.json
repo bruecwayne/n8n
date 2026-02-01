@@ -1,0 +1,3088 @@
+{
+  "name": "__Email_Agent_REIT_Factors",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ab380a2-a8d3-421c-ab4e-748ea8fb7904",
+              "name": "response",
+              "value": "Unable to perform task. Please try again.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "86848129-b6f2-46ec-b9fb-4810ae79680c",
+      "name": "Try Again",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1264,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "39c2f302-03be-4464-a17a-d7cc481d6d44",
+              "name": "=response",
+              "value": "={{$json.output}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c01d5d6d-db57-4fa1-953b-9dd24e1fc306",
+      "name": "Success",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1264,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are an email management assistant for the REITFactors.ai team (Cayman Seagraves, Mariya Letdin, Stace Sirmans). All emails must be formatted professionally in HTML and signed off as \"Cayman\" or the appropriate team member.\n\n# Tools\n- Think1: Use the tool to think about something. It will not obtain new information or change the database, but just append the thought to the log. Use it when complex reasoning or some cache memory is needed. **Always** use the think tool to first list the tasks you need to complete.\n\n## Email Style & Communication Guidelines\n\n### Tone & Formality\n- Maintain a consistently professional, courteous, and positive tone\n- Begin emails with appropriate greetings: \"Dear [Name]\" or \"Hi [Name]\" for direct contacts; \"Dear [Firm Name] Research Team\" for institutional addresses\n- End with warm sign-offs: \"Best regards,\" \"Best,\" or \"Thank you!\" based on context\n- Adapt formality level: highly structured for institutional/formal recipients; professional but approachable for colleagues\n- Use emojis sparingly and only never in formal correspondence\n\n### Email Structure & Length\n- Keep emails concise and focused, typically 2-4 short paragraphs for outreach\n- Exception: Detailed explanations of methodology or research findings may be longer\n- Use clear, direct, and persuasive language\n- Include action-oriented phrases: \"please let me know,\" \"I'd be happy to discuss,\" \"looking forward to meeting you\"\n\n### Professional Context\n- Write from the perspective of the REITFactors.ai research team - PhD-level finance academics commercializing REIT-specific factor models\n- Emphasize expertise in real estate finance, factor modeling, and institutional asset management\n- Highlight the combination of academic validation (peer-reviewed publication) and commercial platform\n- Demonstrate solution-oriented approach for institutional clients and partners\n- Balance academic credibility with practical, business-focused value delivery\n- Focus on mutual benefit: how REITFactors.ai data/analytics solve real institutional pain points\n\n### Common Email Types\n- **Institutional Investor Outreach**: Portfolio managers, analysts interested in REIT factor data and attribution\n- **Sell-Side Research**: Equity research teams at major investment banks seeking factor models\n- **Index/Benchmark Partners**: Potential index construction and licensing discussions\n- **Corporate IR/CFO**: REIT management teams interested in factor attribution and performance analysis\n- **Research Partnerships**: Academic and industry research collaborations\n\n## Email Management Tools\n- Use \"Send Email\" to send emails\n- Use \"Create Draft\" if the user asks for a draft\n- Use \"Get Emails\" to retrieve emails when requested\n- Use \"Get Labels\" to retrieve labels\n- Use \"Mark Unread\" to mark an email as unread. You must use \"Get Emails\" first so you have the message ID of the email to flag\n- Use \"Label Email\" to flag an email. You must use \"Get Emails\" first so you have the message ID of the email to flag. Then you must use \"Get Labels\" so you have the label ID\n- Use \"Email Reply\" to reply to an email. You must use \"Get Emails\" first so you have the message ID of the email to reply to\n\n## Final Notes\n- Here is the current date/time: {{ $now }}\n- Event Context: REITworld 2025 is Dec 8-11 in Dallas at the Hilton Anatole\n- Website: reitfactors.ai | Research page: reitfactors.ai/research | Dashboard: reitfactors.ai/dashboard\n- Always maintain professional credibility as PhD-level researchers commercializing institutional-grade REIT research\n- Ensure all communications reflect expertise in quantitative real estate finance and institutional asset management"
+        }
+      },
+      "id": "b0d6bc7a-150c-4a6c-ba7e-9dfb577a6330",
+      "name": "Email Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        656,
+        192
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $fromAI(\"emailAddress\") }}",
+        "subject": "={{ $fromAI(\"subject\") }}",
+        "message": "={{ $fromAI(\"emailBody\") }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        288,
+        608
+      ],
+      "id": "3a7bcb15-a944-456f-9164-67e1c38c9d32",
+      "name": "Send Email",
+      "webhookId": "86c8c4b1-13bb-4ebe-acb9-30e1d7082d55"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": "={{ $fromAI(\"limit\",\"how many emails the user wants\") }}",
+        "filters": {
+          "sender": "={{ $fromAI(\"sender\",\"who the emails are from\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        928,
+        704
+      ],
+      "id": "cd24a9da-a2bd-4a3a-a866-96eaa79fe588",
+      "name": "Get Emails",
+      "webhookId": "af4b3298-9037-44b0-aa12-2acbfbb5e66f"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $fromAI(\"subject\") }}",
+        "emailType": "html",
+        "message": "={{ $fromAI(\"emailBody\") }}",
+        "options": {
+          "sendTo": "={{ $fromAI(\"emailAddress\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        768,
+        736
+      ],
+      "id": "d1c4e136-7201-4b4c-b8db-4c7a35505f98",
+      "name": "Create Draft",
+      "webhookId": "17016bce-d7d7-428a-a56c-f6ea122db8be"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $fromAI(\"ID\",\"the message ID\") }}",
+        "message": "={{ $fromAI(\"emailBody\") }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        448,
+        672
+      ],
+      "id": "dd7ba150-8571-461b-b471-e7de97d4ab02",
+      "name": "Email Reply",
+      "webhookId": "114785e6-a859-432b-81b4-c490c1c35b1c"
+    },
+    {
+      "parameters": {
+        "resource": "label",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        656
+      ],
+      "id": "1682c7c0-bd9f-4083-b810-ebf73cef5a1c",
+      "name": "Get Labels",
+      "webhookId": "9e08b59e-792d-4566-83f1-9263c9ad86ae"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $fromAI(\"ID\",\"the ID of the message\") }}",
+        "labelIds": "={{ $fromAI(\"labelID\") }}"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        608,
+        704
+      ],
+      "id": "799b1365-30e4-4814-b16c-ab5087dfba56",
+      "name": "Label Emails",
+      "webhookId": "0e951529-2e6d-40bf-ac40-fc0947e242e2"
+    },
+    {
+      "parameters": {
+        "operation": "markAsUnread",
+        "messageId": "={{ $fromAI(\"messageID\") }}"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1184,
+        592
+      ],
+      "id": "76e48864-7e09-444d-9325-63f8d1da6bb0",
+      "name": "Mark Unread",
+      "webhookId": "a35af9d8-f67d-4ff9-803f-59ec6356e795"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        176
+      ],
+      "id": "dc716d37-3095-4712-b36b-16321d01d02f",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "content": "## REITFactors.ai — Institutional Outreach Agent\n**Purpose:** B2B email outreach for REITworld 2025 attendees\n**Event:** Dallas, Dec 8-11, 2025 (Hilton Anatole)\n**Team:** Cayman, Mariya, Stace\n**Website:** reitfactors.ai",
+        "height": 940,
+        "width": 1540,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "f9420934-91b6-44e6-bbe7-13208edfee8b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        80,
+        816
+      ],
+      "id": "f9dc4a1c-5761-470d-bc4c-fee6c1785a04",
+      "name": "gpt-4.1-mini1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "PZZJ46UbdVb0XpMd",
+          "name": "OpenRouter-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        784
+      ],
+      "id": "82042cf1-7ece-400d-b397-040d0b5ae39c",
+      "name": "gpt-4.1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "PZZJ46UbdVb0XpMd",
+          "name": "OpenRouter-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        496
+      ],
+      "id": "370e9f17-fd92-4316-822f-17433c961df0",
+      "name": "Think1"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=5651597774"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        368
+      ],
+      "id": "0a9e0f53-c16f-4bb1-84db-843058af8151",
+      "name": "Window Buffer Memory1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2816,
+        1616
+      ],
+      "id": "23886a7b-4785-4f2c-aa17-8ff5d162ea9d",
+      "name": "When clicking 'Execute workflow'"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 11,
+        "simple": false,
+        "filters": {
+          "sender": "cayman-seagraves@utulsa.edu"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        384,
+        2528
+      ],
+      "id": "27da960c-e0c5-4c0a-9cfa-97fe32a5afb5",
+      "name": "Get many messages",
+      "webhookId": "98e2e18b-4aa6-46c0-a833-b15d1501d688"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw",
+          "mode": "list",
+          "cachedResultName": "Social Media Colab - Prospect List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1046393849,
+          "mode": "list",
+          "cachedResultName": "Recent Example Emails - Received",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw/edit#gid=1046393849"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "threadId": "={{ $json.threadId }}",
+            "snippit": "={{ $json.snippet }}",
+            "To": "={{ $json.To }}",
+            "From": "={{ $json.From }}",
+            "Subject": "={{ $json.Subject }}",
+            "labels": "={{ $json.labels }}",
+            "internalDate": "={{ $json.internalDate }}",
+            "historyId": "={{ $json.historyId }}",
+            "sizeEstimate": "={{ $json.sizeEstimate }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "threadId",
+              "displayName": "threadId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "snippit",
+              "displayName": "snippit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sizeEstimate",
+              "displayName": "sizeEstimate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "historyId",
+              "displayName": "historyId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "internalDate",
+              "displayName": "internalDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "labels",
+              "displayName": "labels",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "From",
+              "displayName": "From",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "To",
+              "displayName": "To",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1040,
+        2736
+      ],
+      "id": "9ddef65b-0933-4620-b981-dd9d5569d4ec",
+      "name": "Append or update row in sheet"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.From }}",
+                    "rightValue": "cayman-seagraves@utulsa.edu",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "5bca6e35-5c7b-4006-a535-db31641b1259"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "sent_emails"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b908baa3-db2a-42b7-bb7d-cb488044c7a5",
+                    "leftValue": "={{ $json.To }}",
+                    "rightValue": "cayman-seagraves@utulsa.edu",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "received_emails"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        608,
+        2736
+      ],
+      "id": "3ecb14cc-38f6-4e8e-bc23-33510413ce9a",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        2624
+      ],
+      "id": "577bc2ff-a7bb-4191-950a-39ee22f063d1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        816,
+        2736
+      ],
+      "id": "473d91b1-0019-42f9-81bf-346121b08db3",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw",
+          "mode": "list",
+          "cachedResultName": "Social Media Colab - Prospect List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 690103873,
+          "mode": "list",
+          "cachedResultName": "Recent Example Emails - Sent",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw/edit#gid=690103873"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "threadId": "={{ $json.threadId }}",
+            "text": "={{ $json.text }}",
+            "sizeEstimate": "={{ $json.sizeEstimate }}",
+            "To": "={{ $json.headers.to }}",
+            "Subject": "={{ $json.subject }}",
+            "From": "={{ $json.headers.from }}",
+            "labels": "={{ $json.labelIds }}",
+            "internalDate": "={{ $json.date }}",
+            "message-id": "={{ $json.headers[\"message-id\"] }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "threadId",
+              "displayName": "threadId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sizeEstimate",
+              "displayName": "sizeEstimate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message-id",
+              "displayName": "message-id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "internalDate",
+              "displayName": "internalDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "labels",
+              "displayName": "labels",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "From",
+              "displayName": "From",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "To",
+              "displayName": "To",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        608,
+        2528
+      ],
+      "id": "82779561-57a2-4dad-8b97-d14957447a3b",
+      "name": "Append or update row in sheet1"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 300,
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        384,
+        2736
+      ],
+      "id": "b1d2548b-062d-48cf-b57b-9cacd19f9412",
+      "name": "Get many messages1",
+      "webhookId": "98e2e18b-4aa6-46c0-a833-b15d1501d688"
+    },
+    {
+      "parameters": {
+        "batchSize": 20,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -736,
+        528
+      ],
+      "id": "b9a23bc3-1f94-4607-81b4-ba2fb38b82dc",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        816,
+        2528
+      ],
+      "id": "41227e1b-0cfc-40a6-92d5-e83e4f885a93",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "content": "## Get example emails and save for AI training\n",
+        "height": 540,
+        "width": 1300,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        48,
+        2432
+      ],
+      "typeVersion": 1,
+      "id": "711172bb-69cc-41ea-ac9b-d0b16499bb1c",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ab380a2-a8d3-421c-ab4e-748ea8fb7904",
+              "name": "response",
+              "value": "Unable to perform task. Please try again.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "378b6245-612a-4467-8e71-a68d6489a403",
+      "name": "Try Again1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1248,
+        1376
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "39c2f302-03be-4464-a17a-d7cc481d6d44",
+              "name": "=response",
+              "value": "={{$json.output}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "31ffd55f-fea4-473f-9961-7f08d0a294ef",
+      "name": "Success1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1248,
+        1184
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=____________________________\n# Task:\n{{ $json.prompt }}\n\n\n{{ $json.details }}\n\n\n\n{{ $json.formatting }}\n\n\n# label\nImportant: You must use the gmail label tool to label the draft email as: \"{{ $json.label }}\"",
+        "options": {
+          "systemMessage": "=# Persona and Role\nYou are the \"REITFactors.ai Institutional Outreach Assistant,\" an expert email strategist for the REITFactors.ai team (Cayman Seagraves, Mariya Letdin, Stace Sirmans). Your primary goal is to secure high-value meetings with institutional investors, sell-side analysts, and strategic partners by communicating the unique value of REIT-specific factor models and analytics.\n\n**Your Persona:**\n* **Strategic:** You frame every pitch as a clear business opportunity for the institution—how REIT-specific factors solve real portfolio problems.\n* **Credible:** You write with authority, backed by PhD-level academic research and institutional-grade data infrastructure.\n* **Context-Aware:** You ALWAYS review past communications and the prospect's role to ensure you understand their specific investment focus.\n* **Value-Driven:** You focus on tangible outcomes: better factor attribution, superior risk models, or index alignment opportunities.\n* **Professional:** Your language mirrors the institutional finance standards expected by portfolio managers, analysts, and strategic partners."
+        }
+      },
+      "id": "979b6aeb-ba35-412c-b689-5a51e92610d4",
+      "name": "Email Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        640,
+        1264
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $fromAI(\"emailAddress\") }}",
+        "subject": "={{ $fromAI(\"subject\") }}",
+        "message": "={{ $fromAI(\"emailBody\") }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        1968
+      ],
+      "id": "2e5443b9-c756-48e5-9e66-0bd188d06750",
+      "name": "Send Email1",
+      "webhookId": "86c8c4b1-13bb-4ebe-acb9-30e1d7082d55"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": "=10",
+        "filters": {
+          "sender": "={{ $fromAI(\"sender\",\"who the emails are from\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        816,
+        1888
+      ],
+      "id": "e2708d98-d62b-4f30-95a8-c2c5db5ea876",
+      "name": "Get Emails1",
+      "webhookId": "af4b3298-9037-44b0-aa12-2acbfbb5e66f"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $fromAI(\"subject\") }}",
+        "emailType": "html",
+        "message": "={{ $fromAI(\"emailBody\") }}",
+        "options": {
+          "sendTo": "={{ $fromAI(\"emailAddress\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        656,
+        1904
+      ],
+      "id": "5b7127e2-2c7b-4cfb-afd4-605a6cb9f33e",
+      "name": "Create Draft1",
+      "webhookId": "17016bce-d7d7-428a-a56c-f6ea122db8be"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $fromAI(\"ID\",\"the message ID\") }}",
+        "message": "={{ $fromAI(\"emailBody\") }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        336,
+        1856
+      ],
+      "id": "935e676b-4806-4a78-838f-1f921de0416f",
+      "name": "Email Reply1",
+      "webhookId": "114785e6-a859-432b-81b4-c490c1c35b1c"
+    },
+    {
+      "parameters": {
+        "resource": "label",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1056,
+        1856
+      ],
+      "id": "53c3b320-eea2-4b7d-b3cf-c1fcfac2607b",
+      "name": "Get Labels1",
+      "webhookId": "9e08b59e-792d-4566-83f1-9263c9ad86ae"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $fromAI(\"ID\",\"the ID of the message\") }}",
+        "labelIds": "={{ $fromAI(\"labelID\") }}"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        496,
+        1888
+      ],
+      "id": "fd424224-4ad4-45f6-85df-6aa4dc0584ee",
+      "name": "Label Emails1",
+      "webhookId": "0e951529-2e6d-40bf-ac40-fc0947e242e2"
+    },
+    {
+      "parameters": {
+        "operation": "markAsUnread",
+        "messageId": "={{ $fromAI(\"messageID\") }}"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        1792
+      ],
+      "id": "cdc93e33-61ed-45be-9e40-c7f93923781c",
+      "name": "Mark Unread1",
+      "webhookId": "a35af9d8-f67d-4ff9-803f-59ec6356e795"
+    },
+    {
+      "parameters": {
+        "content": "## REITFactors.ai — Email Campaign Execution\n**Contact Database:** REITworld 2025 attendees (portfolio managers, sell-side analysts, index providers, corporate IR)\n**Email Templates:** Based on audience type (PM, Research, Index Partner, REIT IR, Legal/Partnerships)\n**Meeting Goal:** 15-30 min discussion at REITworld to present factor models, dashboard, data capabilities\n**Key Talking Points:** Factor outperformance vs broad equity factors, institutional-grade data, platform features, index alignment",
+        "height": 1280,
+        "width": 2080,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -192,
+        1024
+      ],
+      "typeVersion": 1,
+      "id": "d143f972-4fa8-458e-9852-8f71c80b1f12",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        1696
+      ],
+      "id": "f3ad8c38-7b3e-417e-b8bb-af1accb7bde7",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=5651597774"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        1456
+      ],
+      "id": "fb93f2b8-4b82-40d1-81f3-26b2ddad185d",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -480,
+        528
+      ],
+      "id": "36417cd1-839b-49e3-8fc6-45b8a0a96d24",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.labels }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "notContains",
+                      "rightType": "any"
+                    },
+                    "id": "57d19ec5-5699-472b-aea1-212fe98ffa3f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "general"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3f8fa92b-ca27-4aed-8f35-a50e0f853f8d",
+                    "leftValue": "={{ $json.labels }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "contains",
+                      "rightType": "any"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "social_media_colab"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -992,
+        624
+      ],
+      "id": "ccae23ea-6450-4453-992e-05daab00c677",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 20,
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -1200,
+        624
+      ],
+      "id": "a16eb19e-dd3e-405c-9d97-67271b03a5db",
+      "name": "Get many messages2",
+      "webhookId": "98e2e18b-4aa6-46c0-a833-b15d1501d688"
+    },
+    {
+      "parameters": {
+        "batchSize": 20,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -736,
+        736
+      ],
+      "id": "05b68fb0-4ca2-41c9-8c7b-7e730c6a2c0c",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b25aa1b2-0953-4e6c-b388-738c3bdd5dd9",
+              "name": "sessionId",
+              "value": "={{ Math.floor(Math.random() * 100000) + 1 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -480,
+        736
+      ],
+      "id": "1b189cea-d8e2-4d5e-9e7a-26589a0ee5ee",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw",
+          "mode": "list",
+          "cachedResultName": "Social Media Colab - Prospect List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1389538155,
+          "mode": "list",
+          "cachedResultName": "REITworld Contact List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw/edit#gid=1389538155"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -2496,
+        1616
+      ],
+      "id": "4e951a37-a32c-441b-ab3a-7a34ab1c8a81",
+      "name": "Get row(s) in sheet"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -2240,
+        1504
+      ],
+      "id": "44505fae-7392-4024-bb65-0225a7c86dd1",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -384,
+        1312
+      ],
+      "id": "e446f102-1738-4534-b2a4-6d3215e31206",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "564fc3b8-a206-4c86-9eee-9471a183e719",
+              "name": "prompt",
+              "value": "={{ `Your task is to draft an institutional outreach email to ${$json[\"First Name\"]} at ${$json[\"Firm\"]}.\n\nREITworld 2025 is Dec 8-11 in Dallas (Hilton Anatole). We aim to schedule a 15-20 minute meeting.\n\nCraft a concise pitch adapted to their specific role in real estate finance:\n\n- **Contact:** ${$json[\"First Name\"]} (${$json[\"Title\"]}) at ${$json[\"Firm\"]}\n- **Email:** ${$json[\"Email\"]}\n- **Key Focus:** ${$json[\"Key Interest\"] || \"REIT factor models and analytics\"}\n\nUse the appropriate email template: Portfolio Manager, Sell-Side Research, Index Provider, Corporate IR, or Strategic Partners. Reference how REITFactors.ai solves their specific institutional needs.` }}",
+              "type": "string"
+            },
+            {
+              "id": "ed218fa9-24ec-4287-b700-ac656b6d567a",
+              "name": "details",
+              "value": "={{ `# Here are the full details for this target:\n- Business Name: ${$json[\"Business Name\"]}\n- Category: ${$json[\"Category\"]}\n- Partnership Readiness Score: ${$json[\"Partnership Readiness Score\"]}\n- Previous Influencer Collaborations: ${$json[\"Previous Influencer Collaborations\"]}\n- Estimated Value (€): ${$json[\"Estimated Value (€)\"]}\n- Unique Value Proposition: ${$json[\"Unique Value Proposition\"]}\n- Website URL: ${$json[\"Website URL\"]}\n- Instagram Handle: ${$json[\"Instagram Handle\"]}\n- TikTok Handle: ${$json[\"TikTok Handle\"]}\n- Marketing Contact Name: ${$json[\"Marketing Contact Name\"]}\n- Direct Email Address: ${$json[\"Direct Email Address\"]}\n- Phone Number: ${$json[\"Phone Number\"]}\n- Best Content Opportunities: ${$json[\"Best Content Opportunities\"]}\n- Enriched Info: ${$json[\"Enriched Info\"]}\n- Strategy: ${$json[\"Strategy\"]}` }}",
+              "type": "string"
+            },
+            {
+              "id": "963189a4-edd4-47b5-8bbc-b95290b1f110",
+              "name": "sessionId",
+              "value": "={{ Math.floor(Math.random() * 100000) + 1 }}",
+              "type": "string"
+            },
+            {
+              "id": "06c55bd6-3c9a-40c5-823b-e05e8508ee19",
+              "name": "formatting",
+              "value": "=## Communication Guidelines\n\n### **HTML Formatting Guidelines (CRITICAL)**\n* **Output Format:** Your final output for the `emailBody` parameter in the `Create Draft1` tool **MUST** be a single string of well-formed HTML.\n* **Structure & Style:** Follow clean, professional institutional style. Use `<p>` for paragraphs, `<ul><li>` for lists, and `<strong>` for bolding. Use the font stack `font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;` with `#212529` for text and `#0d6efd` for links.\n* **Research Validation:** When appropriate, mention that the research is being published in a top-tier journal (Real Estate Economics). This mention **MUST** be a credible academic reference. Use format: `...we published research on REIT-specific factors in <strong>Real Estate Economics</strong>...`\n\n### **HTML Email Template (Follow this structure)**\n```html\n<div style=\"max-width: 700px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #212529; line-height: 1.6;\">\n    <p>Dear [First Name],</p>\n    <p>[Opening: Context + Brief Credibility Statement]</p>\n    <p>[Second Paragraph: Value Proposition for This Specific Role]</p>\n    <p>I'd love to share insights relevant to [their focus area]:</p>\n    <ul style=\"padding-left: 20px;\">\n        <li style=\"margin-bottom: 8px;\">[Factor Model Performance]</li>\n        <li style=\"margin-bottom: 8px;\">[Data/Analytics Capability]</li>\n        <li style=\"margin-bottom: 8px;\">[Index/Benchmark Opportunity]</li>\n    </ul>\n    <p>Would you have 15-20 minutes at REITworld (Dec 9 or 10) to discuss?</p>\n    <p>Best regards,</p>\n    <br>\n    <p style=\"margin: 0; line-height: 1.4;\"><strong>Cayman Seagraves</strong></p>\n    <p style=\"margin: 0; line-height: 1.4;\">Assistant Professor of Finance, University of Tulsa</p>\n    <p style=\"margin: 0; line-height: 1.4;\">Co-author, <a href=\"https://reitfactors.ai\" style=\"color: #0d6efd; text-decoration: none;\">REITFactors.ai</a></p>\n    <p style=\"margin: 0; line-height: 1.4;\"><a href=\"mailto:cayman-seagraves@utulsa.edu\" style=\"color: #0d6efd; text-decoration: none;\">cayman-seagraves@utulsa.edu</a></p>\n</div>",
+              "type": "string"
+            },
+            {
+              "id": "861f2720-168f-4a5e-adc6-8efd92b090d1",
+              "name": "label",
+              "value": "REITworld 2025 - Outreach",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        1312
+      ],
+      "id": "b082c8ff-fb4c-42f6-a386-2e69848943f4",
+      "name": "Build Dynamic Prompt2"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        2048
+      ],
+      "id": "83b98db5-d9da-427a-9c27-edb1615d5e19",
+      "name": "gemini-2.5-pro",
+      "credentials": {
+        "openRouterApi": {
+          "id": "PZZJ46UbdVb0XpMd",
+          "name": "OpenRouter-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ `# Here are the full details for this target:\n- Business Name: ${$json[\"Business Name\"]}\n- Category: ${$json[\"Category\"]}\n- Partnership Readiness Score: ${$json[\"Partnership Readiness Score\"]}\n- Previous Influencer Collaborations: ${$json[\"Previous Influencer Collaborations\"]}\n- Estimated Value (€): ${$json[\"Estimated Value (€)\"]}\n- Unique Value Proposition: ${$json[\"Unique Value Proposition\"]}\n- Website URL: ${$json[\"Website URL\"]}\n- Instagram Handle: ${$json[\"Instagram Handle\"]}\n- TikTok Handle: ${$json[\"TikTok Handle\"]}\n- Marketing Contact Name: ${$json[\"Marketing Contact Name\"]}\n- Direct Email Address: ${$json[\"Direct Email Address\"]}\n- Phone Number: ${$json[\"Phone Number\"]}\n- Best Content Opportunities: ${$json[\"Best Content Opportunities\"]}\n- Enriched Info: ${$json[\"Enriched Info\"]}\n- Strategy: ${$json[\"Strategy\"]}` }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=System Prompt: REITFactors Institutional Contact Research Agent\n1. Persona & Prime Directive\nYou are a World-Class Strategic Research Analyst specializing in institutional real estate finance. You perform deep due diligence on REITworld attendees and potential partners. Your work transforms basic contact data into actionable intelligence that empowers the REITFactors.ai team to craft highly personalized, relevant meeting requests and pitches.\n\n2. The Mission Context\nThe REITFactors.ai team (Cayman, Mariya, Stace) is preparing for REITworld 2025 (Dec 8-11 in Dallas). They have a list of potential portfolio managers, sell-side analysts, index providers, and corporate IR contacts. Your mission is to research each contact's organization, their likely interest in REIT-specific factor models, data capabilities, and index alignment—then populate enriched intelligence columns that enable targeted, relevant outreach.\n\n3. Key Research Focus\nFor each institutional contact, determine:"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -1584,
+        1616
+      ],
+      "id": "18ea83f8-4284-4a61-88fb-7ff0140e6e70",
+      "name": "Enrich Prospects Agent",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Edit Fields6').item.json.sessionId }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1632,
+        1968
+      ],
+      "id": "6d705506-a463-4485-b70d-5ea76691dcda",
+      "name": "Window Buffer Memory2"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Enriched Info\": \"text\",\n\t\"Strategy\": \"text\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -1232,
+        1792
+      ],
+      "id": "9186ece1-654a-473e-9c45-d78f2ab0ad76",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bb515ca3-48ef-4f1c-99a2-78a70b06df01",
+              "name": "sessionId",
+              "value": "={{ Math.floor(Math.random() * 100000) + 1 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2032,
+        1616
+      ],
+      "id": "83894cee-fa7f-458a-a9e6-82a136d87f41",
+      "name": "Edit Fields6"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw",
+          "mode": "list",
+          "cachedResultName": "Social Media Colab - Prospect List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1389538155,
+          "mode": "list",
+          "cachedResultName": "REITworld Contact List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw/edit#gid=1389538155"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Business Name": "={{ $('Edit Fields6').item.json[\"Business Name\"] }}",
+            "Enriched Info": "={{ $json.output[\"Enriched Info\"] }}",
+            "Strategy": "={{ $json.output.Strategy }}"
+          },
+          "matchingColumns": [
+            "Business Name"
+          ],
+          "schema": [
+            {
+              "id": "Business Name",
+              "displayName": "Business Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Partnership Readiness Score",
+              "displayName": "Partnership Readiness Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Previous Influencer Collaborations",
+              "displayName": "Previous Influencer Collaborations",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Estimated Value (€)",
+              "displayName": "Estimated Value (€)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Unique Value Proposition",
+              "displayName": "Unique Value Proposition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Website URL",
+              "displayName": "Website URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Instagram Handle",
+              "displayName": "Instagram Handle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "TikTok Handle",
+              "displayName": "TikTok Handle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Marketing Contact Name",
+              "displayName": "Marketing Contact Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Direct Email Address",
+              "displayName": "Direct Email Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Best Content Opportunities",
+              "displayName": "Best Content Opportunities",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Info",
+              "displayName": "Enriched Info",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Strategy",
+              "displayName": "Strategy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Draft Created?",
+              "displayName": "Draft Created?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Draft Email",
+              "displayName": "Draft Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -1184,
+        1616
+      ],
+      "id": "baeb4d4c-f8ca-4a47-a73f-e7b81c5fc091",
+      "name": "Update row in sheet"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw",
+          "mode": "list",
+          "cachedResultName": "Social Media Colab - Prospect List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1389538155,
+          "mode": "list",
+          "cachedResultName": "REITworld Contact List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw/edit#gid=1389538155"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -1184,
+        1456
+      ],
+      "id": "f5d245d3-d829-428d-8782-0d6779d45373",
+      "name": "Get row(s) in sheet1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -864,
+        1312
+      ],
+      "id": "c6cd79f6-38fb-419f-8fa9-88e98363fed8",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -992,
+        1952
+      ],
+      "id": "3f13816b-d055-4c17-a9f4-becb806cc670",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $fromAI(\"subject\") }}",
+        "emailType": "html",
+        "message": "={{ $fromAI(\"emailBody\") }}",
+        "options": {
+          "sendTo": "={{ $fromAI(\"emailAddress\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1424,
+        1952
+      ],
+      "id": "c98e0669-9c3e-4b7d-9348-84e07c42c544",
+      "name": "Create Draft2",
+      "webhookId": "17016bce-d7d7-428a-a56c-f6ea122db8be"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw",
+          "mode": "list",
+          "cachedResultName": "Social Media Colab - Prospect List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1389538155,
+          "mode": "list",
+          "cachedResultName": "REITworld Contact List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw/edit#gid=1389538155"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Business Name": "={{ $('Edit Fields5').item.json[\"Business Name\"] }}",
+            "Draft Created?": "Yes",
+            "Draft Email": "={{ $json.response }}"
+          },
+          "matchingColumns": [
+            "Business Name"
+          ],
+          "schema": [
+            {
+              "id": "Business Name",
+              "displayName": "Business Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Partnership Readiness Score",
+              "displayName": "Partnership Readiness Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Previous Influencer Collaborations",
+              "displayName": "Previous Influencer Collaborations",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Estimated Value (€)",
+              "displayName": "Estimated Value (€)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Unique Value Proposition",
+              "displayName": "Unique Value Proposition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Website URL",
+              "displayName": "Website URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Instagram Handle",
+              "displayName": "Instagram Handle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "TikTok Handle",
+              "displayName": "TikTok Handle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Marketing Contact Name",
+              "displayName": "Marketing Contact Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Direct Email Address",
+              "displayName": "Direct Email Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Best Content Opportunities",
+              "displayName": "Best Content Opportunities",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Info",
+              "displayName": "Enriched Info",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Strategy",
+              "displayName": "Strategy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Draft Created?",
+              "displayName": "Draft Created?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Draft Email",
+              "displayName": "Draft Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1456,
+        1184
+      ],
+      "id": "7b569f85-5f57-4514-8e6c-b07a5078ff0d",
+      "name": "Update row in sheet1"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1696,
+        2096
+      ],
+      "id": "1060dbbd-bbbd-46cc-b835-bf419c12a61d",
+      "name": "Edit Fields7"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -464,
+        1104
+      ],
+      "id": "f18be30e-d5fa-4750-926d-3c6466e0f7cc",
+      "name": "Edit Fields8"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        1104
+      ],
+      "id": "537ca9d3-212b-456d-ab80-bd29f9f09c20",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d02af599-cc9d-4156-8245-59df5006de77",
+              "leftValue": "={{ $json[\"Enriched Info\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1856,
+        1616
+      ],
+      "id": "008c0043-d920-4244-8fe3-f733d8adbf72",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -1856,
+        1456
+      ],
+      "id": "2532aecc-17eb-44d1-8608-5ea140d0caa8",
+      "name": "Aggregate3"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.5-flash-preview:thinking",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1792
+      ],
+      "id": "24916059-cff1-4b1b-a3c9-fdee4f5eb737",
+      "name": "gemini-2.5-flash-thinking",
+      "credentials": {
+        "openRouterApi": {
+          "id": "PZZJ46UbdVb0XpMd",
+          "name": "OpenRouter-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        144,
+        1840
+      ],
+      "id": "ba850f87-ba0c-4769-be0d-8f4298d15049",
+      "name": "gpt-4.1 mini.",
+      "credentials": {
+        "openRouterApi": {
+          "id": "PZZJ46UbdVb0XpMd",
+          "name": "OpenRouter-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Add label to message in Gmail",
+        "operation": "addLabels",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', `message id`, 'string') }}",
+        "labelIds": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Label_Names_or_IDs', `label name or id`, 'string') }}"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        960,
+        1888
+      ],
+      "id": "90526434-c1af-48ac-8eb9-4e46dd96b7f3",
+      "name": "Add label",
+      "webhookId": "5af5d9e5-0080-46d3-92e0-1340de497bbb"
+    },
+    {
+      "parameters": {
+        "content": "## Enrich data\n",
+        "height": 1280,
+        "width": 2720,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2944,
+        1024
+      ],
+      "typeVersion": 1,
+      "id": "b5f7e450-5c83-4422-985d-fafacf81a1a0",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d02af599-cc9d-4156-8245-59df5006de77",
+              "leftValue": "={{ $json[\"Draft Created?\"] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -624,
+        1312
+      ],
+      "id": "5b8839b6-319b-4f83-a653-183e4b59e047",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw",
+          "mode": "list",
+          "cachedResultName": "Social Media Colab - Prospect List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1389538155,
+          "mode": "list",
+          "cachedResultName": "REITworld Contact List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1S8jt45C5e1H1oQAfZISGolF5bBCEaJ4WB1hbDXY3_Zw/edit#gid=1389538155"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2816,
+        1312
+      ],
+      "id": "a1780204-5807-4b12-9863-e50f4e4ceda9",
+      "name": "Google Sheets Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "96fdf760-f3a3-4274-b753-b2b3152d48fe",
+              "leftValue": "={{ $json[\"Enriched Info\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2496,
+        1312
+      ],
+      "id": "72c916c1-db74-467c-ac54-af3fd092162a",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d02af599-cc9d-4156-8245-59df5006de77",
+              "leftValue": "={{ $json[\"Draft Created?\"] }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2144,
+        1088
+      ],
+      "id": "f1f83475-44f2-4b20-82d4-876cc277878a",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "model": "sonar-reasoning-pro",
+        "messages": {
+          "message": [
+            {
+              "content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('message0_Text', ``, 'string') }}"
+            }
+          ]
+        },
+        "simplify": true,
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexityTool",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        1952
+      ],
+      "id": "9cc123f8-8dee-47f1-be84-4e307ead74b6",
+      "name": "Message a model in Perplexity",
+      "credentials": {
+        "perplexityApi": {
+          "id": "Pb6X1HfdnUQ9K4sk",
+          "name": "Perplexity-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-haiku-4.5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -1808,
+        1888
+      ],
+      "id": "6a861aa0-cfde-4dfe-878d-19eb413f6892",
+      "name": "haiku-4-5",
+      "credentials": {
+        "openRouterApi": {
+          "id": "PZZJ46UbdVb0XpMd",
+          "name": "OpenRouter-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        -1456,
+        1968
+      ],
+      "id": "b1b1f34f-7ffe-417f-94f2-4c2fd7bf25be",
+      "name": "Search in Tavily",
+      "credentials": {
+        "tavilyApi": {
+          "id": "P1rfHRq68EZUsghK",
+          "name": "Tavily-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Extract the contents from a website URL using Firecrawl. Provide the URL to scrape and receive clean markdown content from the webpage.",
+        "method": "POST",
+        "url": "https://api.firecrawl.dev/v1/scrape",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $fromAI('url', 'The URL to scrape and extract content from', 'string') }}\",\n  \"formats\": [\n    \"markdown\"\n  ],\n  \"onlyMainContent\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -1360,
+        2176
+      ],
+      "id": "ba360c93-2129-4755-9384-81e214aea7a6",
+      "name": "Extract with Firecrawl",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "oYPQ1QA6zRBWKIi3",
+          "name": "Header Auth - Firecrawl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to extract the content from a URL",
+        "method": "POST",
+        "url": "https://api.firecrawl.dev/v1/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"{{ $fromAI('query', 'The search query to search the internet and get results back', 'string') }}\",\n  \"limit\": 10,\n  \"location\": \"\",\n  \"tbs\": \"\",\n  \"scrapeOptions\": {\n    \"formats\": [ \"markdown\", \"links\" ]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -1568,
+        2192
+      ],
+      "id": "52e07a8b-b670-4ed2-b26d-e7469e521801",
+      "name": "Search - Firecrawl1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "oYPQ1QA6zRBWKIi3",
+          "name": "Header Auth - Firecrawl"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-haiku-4.5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        256,
+        1664
+      ],
+      "id": "3d5ebc4b-e760-470c-bb21-a73a3fad90ae",
+      "name": "haiku-4-",
+      "credentials": {
+        "openRouterApi": {
+          "id": "PZZJ46UbdVb0XpMd",
+          "name": "OpenRouter-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-haiku-4.5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        144,
+        560
+      ],
+      "id": "36bbec9e-bedd-4732-9cfa-7e7b94c3d7f4",
+      "name": "haiku-4-1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "PZZJ46UbdVb0XpMd",
+          "name": "OpenRouter-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1,
+      "position": [
+        -1136,
+        1984
+      ],
+      "id": "802938be-3343-4324-80ca-c9ae6314dfe9",
+      "name": "Think2"
+    }
+  ],
+  "pinData": {
+    "When clicking 'Execute workflow'": [
+      {
+        "json": {}
+      }
+    ]
+  },
+  "connections": {
+    "Email Agent": {
+      "main": [
+        [
+          {
+            "node": "Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Try Again",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Reply": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Emails": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Draft": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Labels": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Label Emails": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Unread": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gpt-4.1": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Think1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Get many messages",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get many messages1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Agent1": {
+      "main": [
+        [
+          {
+            "node": "Success1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Try Again1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Emails1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Draft1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Reply1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Labels1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Label Emails1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Unread1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Email Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages2": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Build Dynamic Prompt2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "Enrich Prospects Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Enrich Prospects Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields6": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich Prospects Agent": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Dynamic Prompt2": {
+      "main": [
+        [
+          {
+            "node": "Email Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Success1": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields7": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Enrich Prospects Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate3": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gpt-4.1 mini.": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Add label": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model in Perplexity": {
+      "ai_tool": [
+        [
+          {
+            "node": "Enrich Prospects Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "haiku-4-5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Enrich Prospects Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search in Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "Enrich Prospects Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search - Firecrawl1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Enrich Prospects Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract with Firecrawl": {
+      "ai_tool": [
+        [
+          {
+            "node": "Enrich Prospects Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "haiku-4-": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "haiku-4-1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think2": {
+      "ai_tool": [
+        [
+          {
+            "node": "Enrich Prospects Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "40e91053-558f-4203-b8c3-0f173c462c6c",
+  "meta": {
+    "instanceId": "2bd918b407c290e8bb139d969f24518c6daf0a6ae9a8f56196275ae39545b380"
+  },
+  "id": "RoFa6pPWHKeNYoJC",
+  "tags": [
+    {
+      "updatedAt": "2025-10-28T17:43:23.255Z",
+      "createdAt": "2025-10-28T17:43:23.255Z",
+      "id": "B0DAVHnFuSfnw1o8",
+      "name": "REIT Factors"
+    },
+    {
+      "updatedAt": "2025-09-05T16:26:19.813Z",
+      "createdAt": "2025-09-05T16:26:19.813Z",
+      "id": "RfJYShO1nwK471E5",
+      "name": "Email"
+    },
+    {
+      "updatedAt": "2025-09-05T16:24:42.328Z",
+      "createdAt": "2025-09-05T16:24:42.328Z",
+      "id": "rnIzZyASMq3aD95C",
+      "name": "Gmail"
+    }
+  ]
+}

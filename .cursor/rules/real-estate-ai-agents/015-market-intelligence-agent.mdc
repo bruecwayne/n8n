@@ -1,0 +1,33 @@
+---
+description: Multi-source market intelligence synthesis for real estate decision-making
+globs: real-estate-ai-literature-review/Real-Estate-Market-Intelligence-Agent.json,real-estate-ai-literature-review/Additional-Agent-Workflow-Descriptions.md
+alwaysApply: false
+---
+
+## Market Intelligence Synthesis Framework
+
+### Data Source Integration
+- **News Aggregation**: RSS feeds from Bloomberg, Reuters, WSJ Real Estate for event extraction
+- **Social Sentiment**: Twitter, Reddit, LinkedIn analysis for investor confidence and market mood
+- **Economic Indicators**: FRED API data for employment, interest rates, and construction spending
+- **Local Market Data**: Permit data, absorption rates, and cap rate trends
+
+### Analysis Engine Components
+- **Financial News Processor**: NLP for event extraction, sentiment analysis, and market categorization
+- **Market Mood Analyzer**: Transformer models for aspect-based sentiment analysis across platforms
+- **Market Fundamentals Engine**: Statistical modeling of leading/lagging economic indicators
+- **Intelligence Integrator**: Multimodal LLM synthesis of all data sources into coherent narratives
+
+### Intelligence Products
+- **Real-Time Dashboards**: Interactive visualizations with customizable metrics and timeframes
+- **Anomaly Detection**: Statistical process control for unusual market movements and alerts
+- **Trend Forecasting**: Machine learning models for market direction and timing predictions
+- **Personalized Alerts**: Stakeholder-specific notifications based on investment focus and risk tolerance
+
+### Decision Support Applications
+- **Market Research**: Transform data streams into actionable investment insights
+- **Risk Management**: Early warning systems for market changes and emerging risks
+- **Competitive Intelligence**: Track competitor activities and market share changes
+- **Investment Strategy**: Support portfolio managers, developers, and institutional investors
+
+@real-estate-ai-literature-review/Real-Estate-Market-Intelligence-Agent.json

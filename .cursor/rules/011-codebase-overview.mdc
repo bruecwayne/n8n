@@ -1,0 +1,44 @@
+---
+description: Codebase structure and file organization guide for n8n workflows
+globs: *
+alwaysApply: true
+---
+
+## Codebase Structure Overview
+
+### Core Directories
+- **`workflows/`**: 2000+ n8n workflow JSON files - main automation library
+- **`Documentation/`**: Category-specific guides (AI agents, APIs, business processes)
+- **`real-estate-ai-literature-review/`**: Specialized multi-agent workflow examples
+- **`context/`**: Category definitions, search indexes, and metadata
+- **`src/`**: Node.js API server with database and workflow management
+- **`static/`**: HTML/CSS/JS frontend for workflow browsing
+
+### Key Files
+- **`api_server.py`**: Python FastAPI server for workflow operations
+- **`workflow_db.py`**: SQLite database management and workflow indexing
+- **`create_categories.py`**: Automated workflow categorization system
+- **`run.py`**: Main Python application entry point
+- **`package.json`**: Node.js dependencies for the web interface
+- **`Dockerfile`**: Containerization for deployment
+
+### Workflow Organization
+- **JSON Files**: Individual n8n workflow definitions with nodes and connections
+- **Categories**: 16 business function categories (AI, Communication, Data Processing, etc.)
+- **Naming**: Descriptive filenames with service integrations (e.g., "OpenAI-Telegram-Chatbot")
+
+### Development Workflow
+- **Backend**: Python/FastAPI for API endpoints and data processing
+- **Frontend**: Node.js static files for workflow browsing interface
+- **Database**: SQLite for workflow metadata and search indexing
+- **Deployment**: Docker Compose for containerized development/production
+
+### Getting Started
+- **Browse Workflows**: Use `static/index.html` or API endpoints
+- **Search Categories**: Check `context/def_categories.json` for organization
+- **Add Workflows**: Place new JSON files in `workflows/` directory
+- **Update Categories**: Run `create_categories.py` to refresh categorization
+
+@README.md
+@Documentation/category-structure.md
+@api_server.py

@@ -1,0 +1,40 @@
+---
+description: Multi-agent workflow design patterns and orchestration strategies
+globs: real-estate-ai-literature-review/*.json,workflows/*.json
+alwaysApply: false
+---
+
+## Agent Architecture Patterns
+
+### Orchestrator-Worker Pattern
+- Use master orchestrator agents (GPT-4o) for complex multi-step workflows coordinating specialized agents
+- Implement hierarchical agent structures: Orchestrator → Specialized Agents → Tool Execution
+- Connect orchestrators to multiple specialized agents with clear role definitions in system messages
+- Maintain shared global memory buffers (20-30 turn context) for workflow state coordination
+
+### Specialized Agent Design
+- Create focused agents with specific expertise domains (document analysis, financial modeling, risk assessment)
+- Use GPT-4o-mini for specialized agents to optimize cost and performance
+- Implement dedicated memory buffers for each specialized agent to maintain context
+- Include detailed system prompts defining agent capabilities, methodologies, and output formats
+
+### Memory Management
+- Configure BufferWindow memory with 20-30 turn context for complex multi-agent conversations
+- Use separate memory nodes for orchestrator and specialized agents to prevent context conflicts
+- Position memory nodes strategically to maintain conversation flow across agent handoffs
+- Implement conversation memory cleanup strategies for long-running workflows
+
+### Agent Communication Patterns
+- Use $fromAI() expressions for dynamic agent-to-agent communication and task delegation
+- Implement clear escalation paths for issues requiring human judgment
+- Maintain audit trails with confidence scoring for agent recommendations
+- Provide fallback mechanisms when agent capabilities are insufficient
+
+### Workflow Execution Flow
+- Design workflows with parallel processing for independent tasks and sequential integration for dependent tasks
+- Implement webhook triggers for real-time activation and scheduled triggers for monitoring workflows
+- Include comprehensive error handling and validation at each workflow stage
+- End workflows with RespondToWebhook nodes for consistent API responses
+
+@real-estate-ai-literature-review/Agentic-Underwriting-Workflow.json
+@real-estate-ai-literature-review/Multi-agent-workflow-orchestrator.json

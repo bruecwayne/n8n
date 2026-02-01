@@ -1,0 +1,34 @@
+---
+description: Node discovery and workflow pattern analysis using the documentation system
+globs: workflows/*.json,Documentation/ai-agent-development.md,workflow_db.py
+alwaysApply: false
+---
+
+## Workflow Pattern Discovery
+
+### Finding Examples by Use Case
+- **Chatbots & AI Agents**: Communication category for Telegram/Discord + OpenAI integrations
+- **Data Synchronization**: Data Processing category for Google Sheets + Database workflows
+- **API Integrations**: Web Scraping category for HTTP Request patterns
+- **Calendar Automation**: Business Process Automation for Google Calendar/Cal.com workflows
+- **Multi-Agent Systems**: AI Agent Development category for orchestration patterns
+
+### Node Analysis
+- **Triggers**: Webhook (25%), Manual (23%), Scheduled (11%), Complex multi-trigger (41%)
+- **Popular**: HTTP Request, Google Sheets, OpenAI, Telegram, Slack, Webhook, Code/JavaScript
+- **Flow Control**: Split In Batches for bulk processing, Switch for conditions, Merge for streams
+- **Integration Hubs**: Google Workspace, Communication tools (Telegram, Slack, Discord)
+
+### Complexity Levels
+- **Low (≤5 nodes)**: Simple automations, notifications, basic API calls
+- **Medium (6-15 nodes)**: Multi-step workflows with data transformation and logic
+- **High (16+ nodes)**: Enterprise systems, multi-agent orchestration, complex logic
+
+### Service Patterns
+- **Google**: Sheets (data), Drive (storage), Calendar (scheduling), Gmail (notifications)
+- **Communication**: Telegram (bots), Slack (notifications), Discord (engagement)
+- **Database**: PostgreSQL/MySQL (structured), Airtable (flexible), Redis (caching)
+- **AI/ML**: OpenAI (generation), Anthropic (reasoning), Pinecone (vector search)
+
+@Documentation/category-structure.md
+@Documentation/ai-agent-development.md

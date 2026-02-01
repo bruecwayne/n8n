@@ -1,0 +1,45 @@
+---
+description: n8n node configuration patterns and best practices for workflows
+globs: real-estate-ai-literature-review/*.json,workflows/*.json
+alwaysApply: false
+---
+
+## Node Configuration Standards
+
+### Agent Node Setup
+- Use @n8n/n8n-nodes-langchain.agent for orchestrator roles requiring tool coordination
+- Configure system messages with detailed role definitions, capabilities, and workflow instructions
+- Set appropriate model parameters: GPT-4o (2000 tokens, 0.3 temp) for orchestrators, GPT-4o-mini (1000-1500 tokens, 0.2-0.3 temp) for specialists
+- Connect agent nodes to language models, memory buffers, and tool nodes in correct sequence
+
+### Memory Node Configuration
+- Use @n8n/n8n-nodes-langchain.memoryBufferWindow for conversation context
+- Set contextWindowLength to 20-30 turns for complex multi-agent workflows
+- Position memory nodes to connect to agent nodes via ai_memory connections
+- Use separate memory nodes for orchestrator and specialized agents
+
+### Tool Node Integration
+- Connect tool nodes to agent nodes via ai_tool connections with appropriate indices
+- Configure tool descriptions clearly defining capabilities and use cases
+- Use @n8n/n8n-nodes-langchain.toolCode for complex calculations and data processing
+- Implement @n8n/n8n-nodes-langchain.toolHttpRequest for external API integrations
+
+### Trigger Node Patterns
+- Use @n8n/n8n-nodes-langchain.chatTrigger for interactive AI agent workflows with public interfaces
+- Configure webhook triggers with POST methods and responseMode: "responseNode" for API endpoints
+- Set appropriate webhook IDs and allowed origins for security
+- Use schedule triggers for automated monitoring and batch processing workflows
+
+### Code Tool Best Practices
+- Structure Python code tools with clear function definitions and comprehensive docstrings
+- Implement input validation and error handling with try-catch blocks and meaningful error messages
+- Use type hints (Dict, List, Any) and proper data structure handling
+- Return structured JSON responses from code tools for consistent parsing
+
+### Response Node Configuration
+- Use n8n-nodes-base.respondToWebhook with status code 200 for successful responses
+- Connect response nodes as final workflow outputs for API consistency
+- Implement proper error response handling throughout workflow chains
+
+@real-estate-ai-literature-review/AI-Agent.json
+@real-estate-ai-literature-review/Dynamic-Portfolio-Management-Agent.json

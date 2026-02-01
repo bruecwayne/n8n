@@ -1,0 +1,603 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "underwriting-request",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "408b2ced-cb34-41e9-8658-c4c3016c8aa8",
+      "name": "Commercial Underwriting Request",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        -240,
+        288
+      ],
+      "typeVersion": 2,
+      "webhookId": "underwriting-webhook"
+    },
+    {
+      "parameters": {},
+      "id": "2ed68998-670a-4c62-a605-7f9d1144ca55",
+      "name": "Global Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        -64,
+        544
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {
+          "maxTokens": 2000,
+          "temperature": 0.3
+        }
+      },
+      "id": "5b1ff9a0-d9cc-41f1-901a-cc4b8132926a",
+      "name": "Orchestrator Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -192,
+        544
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "R4kqYMlb7z36skUH",
+          "name": "OpenAi-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Specializes in parsing lease documents to extract financial terms, tenant obligations, and risk factors",
+        "text": "={{ $fromAI('leaseAnalysis', 'Analyze lease document for financial terms and risk factors', 'string') }}",
+        "options": {
+          "systemMessage": "You are a Lease Document Specialist with expertise in commercial real estate leasing. You analyze lease agreements to extract:\n\nFinancial Terms:\n- Rent escalations and adjustments\n- Tenant improvement allowances\n- Free rent periods and concessions\n- Security deposit requirements\n- Termination clauses and penalties\n\nRisk Factors:\n- Lease term and renewal options\n- Tenant financial strength indicators\n- Maintenance and repair obligations\n- Insurance requirements\n- Default and cure provisions\n\nCross-reference all findings against property records and provide structured output with risk flags for underwriting consideration."
+        }
+      },
+      "id": "cd910273-ebbf-487b-a5e7-4a3cd755d5bf",
+      "name": "Lease Document Specialist",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "position": [
+        96,
+        624
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {
+          "maxTokens": 1500,
+          "temperature": 0.2
+        }
+      },
+      "id": "34b6bd24-15d5-45ab-b3cf-056e6a76203c",
+      "name": "Document Parser Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        64,
+        800
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "R4kqYMlb7z36skUH",
+          "name": "OpenAi-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "6b55a6f6-3ba7-4b23-8ffb-3607b8f96c35",
+      "name": "Parser Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        224,
+        800
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "toolDescription": "Performs discounted cash flow analysis, sensitivity testing, and comparable transaction analysis",
+        "text": "={{ $fromAI('financialModeling', 'Build financial model with DCF analysis and sensitivity testing', 'string') }}",
+        "options": {
+          "systemMessage": "You are a Cash Flow Analyst specializing in commercial real estate financial modeling. You provide:\n\nDiscounted Cash Flow Analysis:\n- NPV calculations across multiple scenarios\n- IRR projections with probability weighting\n- Payback period analysis\n\nSensitivity Testing:\n- Rent growth rate variations\n- Vacancy rate stress testing\n- Interest rate sensitivity analysis\n- Operating expense inflation scenarios\n\nMarket Comparables:\n- Cap rate analysis by property type\n- Transaction velocity metrics\n- Market rent growth projections\n\nAlways provide confidence intervals and highlight key assumptions affecting returns."
+        }
+      },
+      "id": "35ff6435-ec6b-4c29-bb0c-c5d3fbcea3ea",
+      "name": "Cash Flow Analyst",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "position": [
+        496,
+        624
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {
+          "maxTokens": 1200,
+          "temperature": 0.1
+        }
+      },
+      "id": "cdd4d9bb-d1dd-4a61-ae75-9d39604f0801",
+      "name": "Financial Modeler Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        464,
+        800
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "R4kqYMlb7z36skUH",
+          "name": "OpenAi-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "66fa600e-554a-448f-a10a-928202a7661a",
+      "name": "Modeler Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        624,
+        800
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "toolDescription": "Conducts comprehensive due diligence including environmental, legal, and market risk assessments",
+        "text": "={{ $fromAI('riskAssessment', 'Perform comprehensive risk assessment across all categories', 'string') }}",
+        "options": {
+          "systemMessage": "You are a Due Diligence Investigator conducting comprehensive risk assessments for commercial real estate underwriting. You analyze:\n\nEnvironmental Risks:\n- Flood zone analysis and climate risk\n- Contamination history and remediation requirements\n- Endangered species and wetlands considerations\n- Sustainability requirements and ESG factors\n\nLegal Risks:\n- Title issues and lien searches\n- Litigation history and pending claims\n- Zoning compliance and land use restrictions\n- Regulatory compliance across jurisdictions\n\nMarket Risks:\n- Absorption rate analysis\n- Competitive market positioning\n- Economic indicators and employment trends\n- Demographic shifts and migration patterns\n\nProvide risk matrix with mitigation strategies and go/no-go recommendations."
+        }
+      },
+      "id": "3258a474-0582-4430-895b-e255440c2a5e",
+      "name": "Due Diligence Investigator",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "position": [
+        864,
+        624
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {
+          "maxTokens": 1000,
+          "temperature": 0.3
+        }
+      },
+      "id": "d1c57a18-9cf2-4567-bb69-60d196c15f00",
+      "name": "Risk Assessor Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        832,
+        800
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "R4kqYMlb7z36skUH",
+          "name": "OpenAi-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "649ad88e-295e-4593-90ba-2de72d7b78d5",
+      "name": "Assessor Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        1008,
+        800
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "toolDescription": "Compiles comprehensive underwriting memorandum with executive summary and detailed appendices",
+        "text": "={{ $fromAI('reportSynthesis', 'Synthesize all underwriting analysis into comprehensive memorandum', 'string') }}",
+        "options": {
+          "systemMessage": "You are an Underwriting Memorandum Writer who synthesizes complex commercial real estate analysis into clear, actionable reports. You create:\n\nExecutive Summary:\n- Investment thesis and key highlights\n- Risk-adjusted return projections\n- Critical success factors and assumptions\n\nDetailed Analysis Sections:\n- Property description and market analysis\n- Lease analysis and tenant quality assessment\n- Financial projections and sensitivity analysis\n- Risk assessment and mitigation strategies\n\nAppendices:\n- Lease abstracts and key terms\n- Financial model inputs and outputs\n- Environmental and legal due diligence reports\n- Comparable transaction analysis\n\nEnsure all recommendations include confidence scores and clear rationale."
+        }
+      },
+      "id": "79660afa-c9e1-43b0-8132-e74f876584c2",
+      "name": "Underwriting Memorandum Writer",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "position": [
+        1296,
+        624
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {
+          "maxTokens": 2500,
+          "temperature": 0.4
+        }
+      },
+      "id": "ac0deeb5-4760-41c5-9f98-f64ec7268434",
+      "name": "Report Synthesis Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1280,
+        800
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "R4kqYMlb7z36skUH",
+          "name": "OpenAi-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "807f7181-85d2-4e3c-a22f-269ddc9d4f55",
+      "name": "Synthesis Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        1440,
+        800
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "toolDescription": "Conducts final quality assurance review, cross-checks outputs, and provides audit trails",
+        "text": "={{ $fromAI('qualityReview', 'Perform final quality assurance and cross-validation of underwriting package', 'string') }}",
+        "options": {
+          "systemMessage": "You are a Quality Assurance Reviewer who validates commercial real estate underwriting packages. You perform:\n\nCross-Validation:\n- Verify consistency across all analysis sections\n- Check mathematical accuracy of financial projections\n- Validate data sources and citation accuracy\n\nQuality Control:\n- Assess completeness of due diligence\n- Review risk assessment comprehensiveness\n- Evaluate recommendation rationale\n\nAudit Trail:\n- Document review methodology and findings\n- Identify any gaps requiring additional analysis\n- Provide confidence scoring for entire package\n\nEscalate complex issues to human underwriters and maintain detailed audit logs for regulatory compliance."
+        }
+      },
+      "id": "562cf1e6-8ca8-49fa-9ee9-850e5e016613",
+      "name": "Quality Assurance Reviewer",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "position": [
+        1680,
+        624
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {
+          "maxTokens": 800,
+          "temperature": 0.2
+        }
+      },
+      "id": "04607a69-00e7-49f6-adcb-e967c76d7c55",
+      "name": "QA Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1664,
+        800
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "R4kqYMlb7z36skUH",
+          "name": "OpenAi-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "684e4351-f18e-44bc-ae0a-251c93053911",
+      "name": "QA Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        1808,
+        800
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "3621be85-1747-47b0-b24b-dcc51df73ff4",
+      "name": "Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        1760,
+        288
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are the Underwriting Coordinator, a master orchestrator managing complex commercial real estate due diligence processes. You coordinate between specialized agents to deliver comprehensive underwriting analysis.\n\nYour role:\n1. **Initiation**: Receive underwriting requests with property documents\n2. **Parallel Processing**: Deploy Document Parser and Risk Assessor simultaneously\n3. **Sequential Integration**: Feed results to Financial Modeler\n4. **Synthesis**: Coordinate Report Synthesis Agent for final memorandum\n5. **Verification**: Deploy Quality Assurance Agent for final review\n6. **Delivery**: Return complete underwriting package with confidence scores\n\nAgent Coordination:\n- **Lease Document Specialist**: Extracts financial terms and risk factors\n- **Cash Flow Analyst**: Builds DCF models and sensitivity analysis\n- **Due Diligence Investigator**: Environmental, legal, and market risk assessment\n- **Underwriting Memorandum Writer**: Compiles comprehensive final report\n- **Quality Assurance Reviewer**: Final validation and audit trail\n\nEnsure all agents work efficiently and escalate complex issues requiring human judgment."
+        }
+      },
+      "id": "b5bce05e-3335-481e-b4f0-5ed2390b4244",
+      "name": "Underwriting Coordinator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        528,
+        288
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "content": "## Agentic Underwriting Workflow\n\n**Purpose**: Complex multi-step due diligence processes requiring coordination between specialized agents\n\n**Value**: Reduces underwriting time from weeks to hours while improving consistency and reducing human error\n\n**Agent Structure**:\n- **Orchestrator**: Underwriting Coordinator manages workflow\n- **Document Parser**: Lease Document Specialist\n- **Financial Modeler**: Cash Flow Analyst\n- **Risk Assessor**: Due Diligence Investigator\n- **Report Synthesis**: Underwriting Memorandum Writer\n- **Quality Control**: Quality Assurance Reviewer\n\n**Stakeholders**: Commercial lenders, institutional investors, REITs, investment banks",
+        "height": 1112,
+        "width": 2528,
+        "color": 3
+      },
+      "id": "8c938136-bb00-429d-97e7-2ab6cc2e436e",
+      "name": "Underwriting Documentation",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -384,
+        -112
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "Commercial Underwriting Request": {
+      "main": [
+        [
+          {
+            "node": "Underwriting Coordinator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Global Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Underwriting Coordinator",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orchestrator Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Underwriting Coordinator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lease Document Specialist": {
+      "ai_tool": [
+        [
+          {
+            "node": "Underwriting Coordinator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Document Parser Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Lease Document Specialist",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parser Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Lease Document Specialist",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cash Flow Analyst": {
+      "ai_tool": [
+        [
+          {
+            "node": "Underwriting Coordinator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Financial Modeler Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Cash Flow Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modeler Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Cash Flow Analyst",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Due Diligence Investigator": {
+      "ai_tool": [
+        [
+          {
+            "node": "Underwriting Coordinator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Risk Assessor Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Due Diligence Investigator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assessor Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Due Diligence Investigator",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Underwriting Memorandum Writer": {
+      "ai_tool": [
+        [
+          {
+            "node": "Underwriting Coordinator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Report Synthesis Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Underwriting Memorandum Writer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Synthesis Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Underwriting Memorandum Writer",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quality Assurance Reviewer": {
+      "ai_tool": [
+        [
+          {
+            "node": "Underwriting Coordinator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QA Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Quality Assurance Reviewer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QA Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Quality Assurance Reviewer",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Underwriting Coordinator": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "2bd918b407c290e8bb139d969f24518c6daf0a6ae9a8f56196275ae39545b380"
+  }
+}

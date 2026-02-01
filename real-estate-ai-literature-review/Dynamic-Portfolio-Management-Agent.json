@@ -1,0 +1,337 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "8d241ca8-4002-4443-8fa7-3dee6e014d71",
+      "name": "Market Update Receiver",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -160,
+        480
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {},
+      "id": "bb053318-b025-4129-b59f-731ec5b938d6",
+      "name": "Portfolio State Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        -128,
+        736
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {
+          "maxTokens": 2000,
+          "temperature": 0.3
+        }
+      },
+      "id": "bda74345-ffb6-4c10-b3c2-d553a8d61bf7",
+      "name": "Reinforcement Learning Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -304,
+        736
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "R4kqYMlb7z36skUH",
+          "name": "OpenAi-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Monitors real-time price indices, transaction data, and economic indicators from multiple sources",
+        "url": "https://api.coingecko.com/api/v3/simple/price",
+        "sendQuery": true,
+        "parametersQuery": {
+          "values": [
+            {}
+          ]
+        },
+        "optimizeResponse": true
+      },
+      "id": "cf0da7e1-ecea-4cf3-a37a-a5cb2b0b90b9",
+      "name": "Real Estate Market Intelligence",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [
+        48,
+        736
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "description": "Calculate comprehensive portfolio performance metrics including IRR, Sharpe ratio, alpha generation, Sortino ratio, maximum drawdown, and risk metrics. Provide portfolio returns as a list of decimal values (e.g., [0.05, -0.02, 0.08]) and optionally benchmark returns for alpha calculation.",
+        "language": "python",
+        "pythonCode": "import numpy as np\nimport pandas as pd\nfrom typing import Dict, List, Any\n\n# Calculate portfolio performance metrics\ndef calculate_portfolio_metrics(portfolio_returns: List[float], benchmark_returns: List[float], risk_free_rate: float = 0.02) -> Dict[str, Any]:\n    \"\"\"\n    Calculate key portfolio performance metrics including IRR, Sharpe ratio, alpha, and risk metrics.\n    \n    Args:\n        portfolio_returns: List of portfolio returns (as decimals, e.g., 0.05 for 5%)\n        benchmark_returns: List of benchmark returns for alpha calculation\n        risk_free_rate: Risk-free rate (default 2%)\n    \n    Returns:\n        Dictionary with performance metrics\n    \"\"\"\n    if not portfolio_returns or len(portfolio_returns) < 2:\n        return {\"error\": \"Insufficient portfolio return data\"}\n    \n    # Convert to numpy arrays\n    port_returns = np.array(portfolio_returns)\n    bench_returns = np.array(benchmark_returns) if benchmark_returns else np.zeros_like(port_returns)\n    \n    # Calculate annualized returns\n    total_return = np.prod(1 + port_returns) - 1\n    years = len(port_returns) / 12  # Assuming monthly data\n    annualized_return = (1 + total_return) ** (1 / years) - 1 if years > 0 else 0\n    \n    # Calculate volatility (standard deviation)\n    volatility = np.std(port_returns, ddof=1)\n    annualized_volatility = volatility * np.sqrt(12)  # Annualized\n    \n    # Calculate Sharpe ratio\n    excess_returns = port_returns - risk_free_rate/12  # Monthly risk-free rate\n    sharpe_ratio = np.mean(excess_returns) / np.std(excess_returns, ddof=1) * np.sqrt(12) if np.std(excess_returns, ddof=1) > 0 else 0\n    \n    # Calculate alpha (simplified - difference from benchmark)\n    port_excess_return = np.mean(port_returns - bench_returns)\n    benchmark_excess_return = np.mean(bench_returns)\n    alpha = port_excess_return - benchmark_excess_return\n    \n    # Calculate maximum drawdown\n    cumulative = np.cumprod(1 + port_returns)\n    running_max = np.maximum.accumulate(cumulative)\n    drawdown = (cumulative - running_max) / running_max\n    max_drawdown = np.min(drawdown)\n    \n    # Calculate Sortino ratio (downside deviation)\n    downside_returns = port_returns[port_returns < 0]\n    downside_deviation = np.std(downside_returns, ddof=1) if len(downside_returns) > 0 else 0\n    sortino_ratio = np.mean(excess_returns) / downside_deviation * np.sqrt(12) if downside_deviation > 0 else 0\n    \n    return {\n        \"total_return\": round(float(total_return), 4),\n        \"annualized_return\": round(float(annualized_return), 4),\n        \"annualized_volatility\": round(float(annualized_volatility), 4),\n        \"sharpe_ratio\": round(float(sharpe_ratio), 4),\n        \"alpha\": round(float(alpha), 4),\n        \"max_drawdown\": round(float(max_drawdown), 4),\n        \"sortino_ratio\": round(float(sortino_ratio), 4),\n        \"risk_free_rate\": risk_free_rate\n    }\n\n# Parse input data\ntry:\n    portfolio_data = query.get(\"portfolio_returns\", [])\n    benchmark_data = query.get(\"benchmark_returns\", [])\n    risk_free_rate = query.get(\"risk_free_rate\", 0.02)\n    \n    # Ensure data is in list format\n    if isinstance(portfolio_data, str):\n        portfolio_data = [float(x.strip()) for x in portfolio_data.split(\",\") if x.strip()]\n    if isinstance(benchmark_data, str):\n        benchmark_data = [float(x.strip()) for x in benchmark_data.split(\",\") if x.strip()]\n    \n    result = calculate_portfolio_metrics(portfolio_data, benchmark_data, risk_free_rate)\n    return str(result)\n    \nexcept Exception as e:\n    return f\"Error calculating portfolio metrics: {str(e)}\"",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"required\": [\"portfolio_returns\"],\n  \"properties\": {\n    \"portfolio_returns\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"number\"\n      },\n      \"description\": \"List of portfolio returns as decimals (e.g., [0.05, -0.02, 0.08] for 5%, -2%, 8%)\"\n    },\n    \"benchmark_returns\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"number\"\n      },\n      \"description\": \"Optional list of benchmark returns for alpha calculation\"\n    },\n    \"risk_free_rate\": {\n      \"type\": \"number\",\n      \"default\": 0.02,\n      \"description\": \"Risk-free rate as decimal (default 2%)\"\n    }\n  }\n}"
+      },
+      "id": "df4b7cb9-9fb6-4095-a859-fe47184ee58b",
+      "name": "Portfolio Performance Monitor",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "position": [
+        224,
+        736
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "description": "Analyze transaction costs and liquidity metrics for real estate and investment portfolios. Calculate commissions, bid-ask spreads, market impact, transfer taxes, and liquidity scores. Provide trade details for cost analysis or volume/position data for liquidity assessment.",
+        "language": "python",
+        "pythonCode": "import numpy as np\nfrom typing import Dict, List, Any, Tuple\n\n# Calculate transaction costs and liquidity metrics\ndef calculate_transaction_costs(\n    trade_size: float,\n    asset_price: float,\n    asset_type: str = \"real_estate\",\n    trade_type: str = \"buy\",\n    market_conditions: str = \"normal\"\n) -> Dict[str, Any]:\n    \"\"\"\n    Calculate comprehensive transaction costs including commissions, spreads, and market impact.\n    \n    Args:\n        trade_size: Size of the trade (dollars or square feet)\n        asset_price: Current asset price per unit\n        asset_type: Type of asset (real_estate, stock, bond, etc.)\n        trade_type: buy or sell\n        market_conditions: normal, volatile, illiquid\n    \n    Returns:\n        Dictionary with cost breakdown and total costs\n    \"\"\"\n    if trade_size <= 0 or asset_price <= 0:\n        return {\"error\": \"Invalid trade size or asset price\"}\n    \n    total_value = trade_size\n    \n    # Base commission rates by asset type\n    commission_rates = {\n        \"real_estate\": 0.05,  # 5% typical real estate commission\n        \"stock\": 0.002,      # $0.02 per share average\n        \"bond\": 0.001,       # Lower for bonds\n        \"reit\": 0.003        # REITs similar to stocks\n    }\n    \n    # Get commission rate, default to real estate\n    commission_rate = commission_rates.get(asset_type.lower(), 0.05)\n    \n    # Adjust for market conditions\n    condition_multiplier = {\n        \"normal\": 1.0,\n        \"volatile\": 1.2,\n        \"illiquid\": 1.5\n    }.get(market_conditions.lower(), 1.0)\n    \n    commission_rate *= condition_multiplier\n    \n    # Calculate commissions\n    commission = total_value * commission_rate\n    \n    # Calculate bid-ask spread (simplified model)\n    spread_rates = {\n        \"real_estate\": 0.02,   # 2% spread for real estate\n        \"stock\": 0.001,       # 0.1% for liquid stocks\n        \"bond\": 0.002,        # 0.2% for bonds\n        \"reit\": 0.0015        # 0.15% for REITs\n    }\n    \n    spread_rate = spread_rates.get(asset_type.lower(), 0.02)\n    spread_rate *= condition_multiplier\n    \n    # Spread cost is half the spread (since you cross the spread)\n    spread_cost = total_value * spread_rate * 0.5\n    \n    # Calculate market impact (larger trades move the market more)\n    # Simplified Kyle's lambda model\n    market_impact_rate = 0.001 * np.log(total_value / 1000000) if total_value > 1000000 else 0\n    market_impact_rate *= condition_multiplier\n    market_impact = total_value * max(0, market_impact_rate)\n    \n    # Additional costs\n    transfer_tax = total_value * 0.001 if asset_type.lower() == \"real_estate\" else 0\n    legal_fees = min(total_value * 0.005, 5000) if asset_type.lower() == \"real_estate\" else 0\n    \n    # Total cost\n    total_cost = commission + spread_cost + market_impact + transfer_tax + legal_fees\n    total_cost_percentage = total_cost / total_value\n    \n    # Effective price after costs\n    if trade_type.lower() == \"buy\":\n        effective_price = asset_price * (1 + total_cost_percentage)\n    else:  # sell\n        effective_price = asset_price * (1 - total_cost_percentage)\n    \n    return {\n        \"trade_value\": round(float(total_value), 2),\n        \"commission\": round(float(commission), 2),\n        \"spread_cost\": round(float(spread_cost), 2),\n        \"market_impact\": round(float(market_impact), 2),\n        \"transfer_tax\": round(float(transfer_tax), 2),\n        \"legal_fees\": round(float(legal_fees), 2),\n        \"total_cost\": round(float(total_cost), 2),\n        \"total_cost_percentage\": round(float(total_cost_percentage), 4),\n        \"effective_price\": round(float(effective_price), 2),\n        \"price_impact\": round(float((effective_price - asset_price) / asset_price), 4),\n        \"asset_type\": asset_type,\n        \"trade_type\": trade_type,\n        \"market_conditions\": market_conditions\n    }\n\n# Calculate liquidity metrics\ndef calculate_liquidity_metrics(\n    average_daily_volume: float,\n    position_size: float,\n    volatility: float\n) -> Dict[str, Any]:\n    \"\"\"\n    Calculate liquidity metrics for portfolio management.\n    \n    Args:\n        average_daily_volume: Average daily trading volume\n        position_size: Size of position to trade\n        volatility: Asset volatility (annualized)\n    \n    Returns:\n        Dictionary with liquidity metrics\n    \"\"\"\n    if average_daily_volume <= 0:\n        return {\"error\": \"Invalid volume data\"}\n    \n    # Turnover ratio\n    turnover_ratio = position_size / average_daily_volume\n    \n    # Liquidity score (0-100, higher is better)\n    # Based on position size relative to average volume\n    liquidity_score = max(0, min(100, 100 - (turnover_ratio * 10)))\n    \n    # Days to liquidate position\n    days_to_liquidate = position_size / (average_daily_volume * 0.1)  # Assuming 10% of daily volume\n    \n    # Market impact estimate\n    market_impact_estimate = volatility * np.sqrt(days_to_liquidate / 252) * turnover_ratio\n    \n    return {\n        \"turnover_ratio\": round(float(turnover_ratio), 4),\n        \"liquidity_score\": round(float(liquidity_score), 2),\n        \"days_to_liquidate\": round(float(days_to_liquidate), 2),\n        \"estimated_market_impact\": round(float(market_impact_estimate), 4),\n        \"average_daily_volume\": average_daily_volume,\n        \"position_size\": position_size\n    }\n\n# Parse input data\ntry:\n    # Transaction cost analysis\n    if \"trade_size\" in query:\n        trade_size = float(query.get(\"trade_size\", 0))\n        asset_price = float(query.get(\"asset_price\", 0))\n        asset_type = query.get(\"asset_type\", \"real_estate\")\n        trade_type = query.get(\"trade_type\", \"buy\")\n        market_conditions = query.get(\"market_conditions\", \"normal\")\n        \n        result = calculate_transaction_costs(trade_size, asset_price, asset_type, trade_type, market_conditions)\n        \n    # Liquidity analysis\n    elif \"average_daily_volume\" in query:\n        avg_volume = float(query.get(\"average_daily_volume\", 0))\n        position_size = float(query.get(\"position_size\", 0))\n        volatility = float(query.get(\"volatility\", 0.2))\n        \n        result = calculate_liquidity_metrics(avg_volume, position_size, volatility)\n        \n    else:\n        result = {\"error\": \"Please provide either transaction details (trade_size, asset_price) or liquidity metrics (average_daily_volume, position_size)\"}\n    \n    return str(result)\n    \nexcept Exception as e:\n    return f\"Error analyzing liquidity and costs: {str(e)}\"",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"oneOf\": [\n    {\n      \"required\": [\"trade_size\", \"asset_price\"],\n      \"properties\": {\n        \"trade_size\": {\n          \"type\": \"number\",\n          \"description\": \"Size of the trade in dollars\"\n        },\n        \"asset_price\": {\n          \"type\": \"number\",\n          \"description\": \"Current asset price per unit\"\n        },\n        \"asset_type\": {\n          \"type\": \"string\",\n          \"enum\": [\"real_estate\", \"stock\", \"bond\", \"reit\"],\n          \"default\": \"real_estate\",\n          \"description\": \"Type of asset being traded\"\n        },\n        \"trade_type\": {\n          \"type\": \"string\",\n          \"enum\": [\"buy\", \"sell\"],\n          \"default\": \"buy\",\n          \"description\": \"Type of trade\"\n        },\n        \"market_conditions\": {\n          \"type\": \"string\",\n          \"enum\": [\"normal\", \"volatile\", \"illiquid\"],\n          \"default\": \"normal\",\n          \"description\": \"Current market conditions\"\n        }\n      }\n    },\n    {\n      \"required\": [\"average_daily_volume\", \"position_size\"],\n      \"properties\": {\n        \"average_daily_volume\": {\n          \"type\": \"number\",\n          \"description\": \"Average daily trading volume in dollars\"\n        },\n        \"position_size\": {\n          \"type\": \"number\",\n          \"description\": \"Size of position to trade in dollars\"\n        },\n        \"volatility\": {\n          \"type\": \"number\",\n          \"default\": 0.2,\n          \"description\": \"Asset volatility (annualized, default 20%)\"\n        }\n      }\n    }\n  ]\n}"
+      },
+      "id": "5dec47be-9017-41c5-8205-2ad18865d738",
+      "name": "Liquidity and Cost Analyzer",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "position": [
+        400,
+        736
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {},
+      "id": "b24bd34d-f106-4908-ac6d-a5d30a5752bd",
+      "name": "Portfolio Adjustment Engine",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [
+        592,
+        736
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "toolDescription": "Scans for off-market deals, distressed assets, and development opportunities using NLP and databases",
+        "url": "https://api.github.com/search/repositories",
+        "sendQuery": true,
+        "parametersQuery": {
+          "values": [
+            {}
+          ]
+        },
+        "optimizeResponse": true
+      },
+      "id": "98f016df-c7cb-46df-9de8-f1c6eb93c290",
+      "name": "Opportunity Identifier",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [
+        960,
+        736
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a Reinforcement Learning Portfolio Optimizer that continuously monitors markets and makes autonomous investment decisions in real estate portfolios.\n\nYour Capabilities:\n- **Continuous Monitoring**: Real-time market data integration from CoStar, REIS, Zillow, Federal Reserve\n- **Performance Analytics**: IRR, Sharpe ratios, alpha generation, risk metrics calculation\n- **Cost Optimization**: Transaction cost estimation, bid-ask spreads, market impact analysis\n- **Dynamic Rebalancing**: Optimal timing, tax-loss harvesting, holding period constraints\n- **Opportunity Scanning**: Off-market deals, distressed assets, development opportunities\n- **Risk Management**: Monte Carlo simulations, stress testing, climate risk integration\n\nDecision Framework:\n1. **State Assessment**: Evaluate current portfolio against benchmarks and targets\n2. **Market Intelligence**: Gather real-time data and economic indicators\n3. **Opportunity Analysis**: Scan for new investment opportunities\n4. **Risk Evaluation**: Stress test potential changes and scenarios\n5. **Action Selection**: Determine optimal buy/sell/hold recommendations\n6. **Execution**: Implement approved changes with cost optimization\n7. **Learning**: Update strategy based on outcomes and feedback\n\nPortfolio Optimization Goals:\n- Maximize risk-adjusted returns\n- Maintain target allocations and diversification\n- Minimize transaction costs and tax impacts\n- Adapt to changing market conditions\n- Ensure regulatory compliance and liquidity"
+        }
+      },
+      "id": "82134ffa-ce26-490d-b613-8dbf641094cf",
+      "name": "Portfolio Optimizer",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        448,
+        480
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "content": "## Dynamic Portfolio Management Agent\n\n**Purpose**: Reinforcement learning and autonomous decision-making in real estate portfolio management\n\n**Value**: Enables continuous optimization in illiquid markets where traditional quarterly rebalancing is insufficient\n\n**Core Components**:\n- **Reinforcement Learning Agent**: Portfolio Optimizer with continuous learning\n- **Data Integration**: Real-time market intelligence from multiple sources\n- **Risk Management**: Monte Carlo simulations and stress testing\n- **Execution Engine**: Automated rebalancing with cost optimization\n\n**Tools**:\n- Real Estate Market Intelligence (CoStar, REIS, Zillow)\n- Portfolio Performance Monitor (IRR, Sharpe, alpha)\n- Liquidity and Cost Analyzer (transaction costs)\n- Portfolio Adjustment Engine (rebalancing)\n- Opportunity Identifier (off-market deals)\n- Scenario Analysis Engine (stress testing)\n\n**Stakeholders**: Institutional investors, REITs, pension funds, endowments, family offices",
+        "height": 1076,
+        "width": 1688,
+        "color": 2
+      },
+      "id": "e408a852-2d65-4871-9e5a-eddc20cb76cf",
+      "name": "Portfolio Management Documentation",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -416,
+        -112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "description": "Run Monte Carlo simulations and stress testing scenarios for portfolio risk analysis. Generate probability distributions of portfolio outcomes and test portfolio resilience under various market conditions including financial crises, inflation shocks, and interest rate changes.",
+        "language": "python",
+        "pythonCode": "import numpy as np\nimport pandas as pd\nfrom typing import Dict, List, Any, Tuple\nfrom scipy import stats\n\n# Run Monte Carlo simulations for portfolio stress testing\ndef run_monte_carlo_simulation(\n    initial_portfolio_value: float,\n    expected_return: float,\n    volatility: float,\n    time_horizon_years: int = 5,\n    num_simulations: int = 1000,\n    inflation_rate: float = 0.02\n) -> Dict[str, Any]:\n    \"\"\"\n    Run Monte Carlo simulation to forecast portfolio value distribution.\n    \n    Args:\n        initial_portfolio_value: Starting portfolio value\n        expected_return: Expected annual return (decimal)\n        volatility: Annual volatility (decimal)\n        time_horizon_years: Number of years to simulate\n        num_simulations: Number of simulation runs\n        inflation_rate: Expected inflation rate (decimal)\n    \n    Returns:\n        Dictionary with simulation results and risk metrics\n    \"\"\"\n    if initial_portfolio_value <= 0 or num_simulations <= 0 or time_horizon_years <= 0:\n        return {\"error\": \"Invalid simulation parameters\"}\n    \n    # Monthly parameters (assuming monthly returns)\n    monthly_return = expected_return / 12\n    monthly_volatility = volatility / np.sqrt(12)\n    monthly_inflation = inflation_rate / 12\n    num_periods = time_horizon_years * 12\n    \n    # Run simulations\n    portfolio_values = np.zeros((num_simulations, num_periods + 1))\n    portfolio_values[:, 0] = initial_portfolio_value\n    \n    for sim in range(num_simulations):\n        for period in range(1, num_periods + 1):\n            # Generate random return (normal distribution)\n            random_return = np.random.normal(monthly_return, monthly_volatility)\n            # Adjust for inflation\n            real_return = random_return - monthly_inflation\n            # Update portfolio value\n            portfolio_values[sim, period] = portfolio_values[sim, period-1] * (1 + real_return)\n    \n    # Calculate statistics\n    final_values = portfolio_values[:, -1]\n    \n    # Value at Risk (VaR) - 95% confidence\n    var_95 = np.percentile(final_values, 5)\n    var_99 = np.percentile(final_values, 1)\n    \n    # Expected shortfall (CVaR) - average of worst 5%\n    cvar_95 = np.mean(final_values[final_values <= var_95])\n    \n    # Probability of loss\n    prob_loss = np.mean(final_values < initial_portfolio_value)\n    \n    # Best and worst case scenarios\n    best_case = np.max(final_values)\n    worst_case = np.min(final_values)\n    median_case = np.median(final_values)\n    \n    # Sharpe ratio (simplified - using expected return/volatility)\n    sharpe_ratio = expected_return / volatility\n    \n    return {\n        \"initial_value\": round(float(initial_portfolio_value), 2),\n        \"expected_final_value\": round(float(np.mean(final_values)), 2),\n        \"median_final_value\": round(float(median_case), 2),\n        \"best_case\": round(float(best_case), 2),\n        \"worst_case\": round(float(worst_case), 2),\n        \"var_95_percent\": round(float(var_95), 2),\n        \"var_99_percent\": round(float(var_99), 2),\n        \"cvar_95_percent\": round(float(cvar_95), 2),\n        \"probability_of_loss\": round(float(prob_loss), 4),\n        \"sharpe_ratio\": round(float(sharpe_ratio), 4),\n        \"standard_deviation\": round(float(np.std(final_values)), 2),\n        \"time_horizon_years\": time_horizon_years,\n        \"num_simulations\": num_simulations\n    }\n\n# Run stress testing scenarios\ndef run_stress_tests(\n    portfolio_value: float,\n    portfolio_composition: Dict[str, float],\n    scenarios: List[Dict[str, Any]]\n) -> Dict[str, Any]:\n    \"\"\"\n    Run predefined stress test scenarios on the portfolio.\n    \n    Args:\n        portfolio_value: Current portfolio value\n        portfolio_composition: Dictionary of asset classes and their weights\n        scenarios: List of stress test scenarios\n    \n    Returns:\n        Dictionary with stress test results\n    \"\"\"\n    if not portfolio_composition or not scenarios:\n        return {\"error\": \"Invalid portfolio composition or scenarios\"}\n    \n    # Normalize portfolio weights\n    total_weight = sum(portfolio_composition.values())\n    if abs(total_weight - 1.0) > 0.01:  # Allow small rounding errors\n        # Normalize if not already normalized\n        portfolio_composition = {k: v/total_weight for k, v in portfolio_composition.items()}\n    \n    results = []\n    \n    # Default stress test scenarios if none provided\n    if not scenarios:\n        scenarios = [\n            {\"name\": \"2008 Financial Crisis\", \"equity\": -0.37, \"bonds\": -0.03, \"real_estate\": -0.25, \"commodities\": -0.32},\n            {\"name\": \"2020 COVID Crash\", \"equity\": -0.34, \"bonds\": -0.02, \"real_estate\": -0.15, \"commodities\": -0.25},\n            {\"name\": \"Inflation Shock\", \"equity\": -0.15, \"bonds\": -0.08, \"real_estate\": 0.05, \"commodities\": 0.25},\n            {\"name\": \"Interest Rate Hike\", \"equity\": -0.10, \"bonds\": -0.05, \"real_estate\": -0.08, \"commodities\": 0.02},\n            {\"name\": \"Tech Bubble Burst\", \"equity\": -0.25, \"bonds\": 0.02, \"real_estate\": -0.05, \"commodities\": -0.08}\n        ]\n    \n    for scenario in scenarios:\n        scenario_name = scenario.get(\"name\", \"Unnamed Scenario\")\n        \n        # Calculate portfolio return under this scenario\n        portfolio_return = 0\n        asset_returns = {}\n        \n        for asset_class, weight in portfolio_composition.items():\n            # Get return for this asset class in the scenario\n            asset_return = scenario.get(asset_class.lower(), 0)  # Default to 0 if not specified\n            asset_returns[asset_class] = asset_return\n            portfolio_return += weight * asset_return\n        \n        # Calculate new portfolio value\n        new_value = portfolio_value * (1 + portfolio_return)\n        loss_amount = portfolio_value - new_value\n        loss_percentage = portfolio_return  # Since portfolio_return is already a decimal\n        \n        results.append({\n            \"scenario_name\": scenario_name,\n            \"portfolio_return\": round(float(portfolio_return), 4),\n            \"new_portfolio_value\": round(float(new_value), 2),\n            \"loss_amount\": round(float(loss_amount), 2),\n            \"loss_percentage\": round(float(loss_percentage), 4),\n            \"asset_returns\": {k: round(float(v), 4) for k, v in asset_returns.items()}\n        })\n    \n    # Sort by worst-case scenarios first\n    results.sort(key=lambda x: x[\"portfolio_return\"])\n    \n    return {\n        \"stress_test_results\": results,\n        \"worst_case_scenario\": results[0] if results else None,\n        \"best_case_scenario\": results[-1] if results else None,\n        \"average_loss\": round(float(np.mean([r[\"loss_percentage\"] for r in results])), 4),\n        \"max_loss\": round(float(min([r[\"portfolio_return\"] for r in results])), 4),\n        \"num_scenarios\": len(results)\n    }\n\n# Parse input data\ntry:\n    # Monte Carlo simulation\n    if \"initial_portfolio_value\" in query:\n        initial_value = float(query.get(\"initial_portfolio_value\", 0))\n        expected_return = float(query.get(\"expected_return\", 0.07))\n        volatility = float(query.get(\"volatility\", 0.15))\n        time_horizon = int(query.get(\"time_horizon_years\", 5))\n        num_sims = int(query.get(\"num_simulations\", 1000))\n        inflation = float(query.get(\"inflation_rate\", 0.02))\n        \n        result = run_monte_carlo_simulation(initial_value, expected_return, volatility, time_horizon, num_sims, inflation)\n        \n    # Stress testing\n    elif \"portfolio_composition\" in query:\n        portfolio_value = float(query.get(\"portfolio_value\", 0))\n        portfolio_comp = query.get(\"portfolio_composition\", {})\n        scenarios = query.get(\"scenarios\", [])\n        \n        # Handle string input for portfolio composition\n        if isinstance(portfolio_comp, str):\n            try:\n                portfolio_comp = eval(portfolio_comp)\n            except:\n                return \"Error: Invalid portfolio composition format. Use dictionary like {'equity': 0.6, 'bonds': 0.3, 'real_estate': 0.1}\"\n        \n        # Handle string input for scenarios\n        if isinstance(scenarios, str):\n            try:\n                scenarios = eval(scenarios)\n            except:\n                scenarios = []\n        \n        result = run_stress_tests(portfolio_value, portfolio_comp, scenarios)\n        \n    else:\n        result = {\"error\": \"Please provide either Monte Carlo simulation parameters (initial_portfolio_value, expected_return, volatility) or stress testing parameters (portfolio_value, portfolio_composition)\"}\n    \n    return str(result)\n    \nexcept Exception as e:\n    return f\"Error running scenario analysis: {str(e)}\"",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"oneOf\": [\n    {\n      \"required\": [\"initial_portfolio_value\", \"expected_return\", \"volatility\"],\n      \"properties\": {\n        \"initial_portfolio_value\": {\n          \"type\": \"number\",\n          \"description\": \"Starting portfolio value in dollars\"\n        },\n        \"expected_return\": {\n          \"type\": \"number\",\n          \"default\": 0.07,\n          \"description\": \"Expected annual return as decimal (default 7%)\"\n        },\n        \"volatility\": {\n          \"type\": \"number\",\n          \"default\": 0.15,\n          \"description\": \"Annual volatility as decimal (default 15%)\"\n        },\n        \"time_horizon_years\": {\n          \"type\": \"integer\",\n          \"default\": 5,\n          \"description\": \"Number of years to simulate (default 5)\"\n        },\n        \"num_simulations\": {\n          \"type\": \"integer\",\n          \"default\": 1000,\n          \"description\": \"Number of Monte Carlo simulations to run (default 1000)\"\n        },\n        \"inflation_rate\": {\n          \"type\": \"number\",\n          \"default\": 0.02,\n          \"description\": \"Expected inflation rate as decimal (default 2%)\"\n        }\n      }\n    },\n    {\n      \"required\": [\"portfolio_value\", \"portfolio_composition\"],\n      \"properties\": {\n        \"portfolio_value\": {\n          \"type\": \"number\",\n          \"description\": \"Current portfolio value in dollars\"\n        },\n        \"portfolio_composition\": {\n          \"type\": \"object\",\n          \"description\": \"Dictionary of asset classes and their weights (e.g., {'equity': 0.6, 'bonds': 0.3, 'real_estate': 0.1})\"\n        },\n        \"scenarios\": {\n          \"type\": \"array\",\n          \"description\": \"Optional custom stress test scenarios. If not provided, uses historical crisis scenarios.\"\n        }\n      }\n    }\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        1120,
+        736
+      ],
+      "id": "33295c56-3bfe-4253-a744-15eeb1aeb113",
+      "name": "Scenario Analysis Engine"
+    },
+    {
+      "parameters": {
+        "url": "https://mcp.financialdatasets.ai/mcp",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_KEY"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        768,
+        736
+      ],
+      "id": "b6c1899d-2027-40d6-9728-36c7c0119733",
+      "name": "Get Financial Statements"
+    }
+  ],
+  "connections": {
+    "Market Update Receiver": {
+      "main": [
+        [
+          {
+            "node": "Portfolio Optimizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Portfolio State Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Portfolio Optimizer",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reinforcement Learning Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Portfolio Optimizer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Real Estate Market Intelligence": {
+      "ai_tool": [
+        [
+          {
+            "node": "Portfolio Optimizer",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Portfolio Performance Monitor": {
+      "ai_tool": [
+        [
+          {
+            "node": "Portfolio Optimizer",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Liquidity and Cost Analyzer": {
+      "ai_tool": [
+        [
+          {
+            "node": "Portfolio Optimizer",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Portfolio Adjustment Engine": {
+      "ai_tool": [
+        [
+          {
+            "node": "Portfolio Optimizer",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Opportunity Identifier": {
+      "ai_tool": [
+        [
+          {
+            "node": "Portfolio Optimizer",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scenario Analysis Engine": {
+      "ai_tool": [
+        [
+          {
+            "node": "Portfolio Optimizer",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Financial Statements": {
+      "ai_tool": [
+        [
+          {
+            "node": "Portfolio Optimizer",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "2bd918b407c290e8bb139d969f24518c6daf0a6ae9a8f56196275ae39545b380"
+  }
+}

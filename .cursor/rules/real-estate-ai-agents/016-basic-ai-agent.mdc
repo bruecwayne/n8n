@@ -1,0 +1,33 @@
+---
+description: Basic n8n AI agent with chat interface and tool integration
+globs: real-estate-ai-literature-review/AI-Agent.json
+alwaysApply: false
+---
+
+## Basic AI Agent Implementation
+
+### Core Architecture Components
+- **Chat Trigger**: Public chat interface with welcome message and conversation memory
+- **AI Agent Node**: LangChain agent with tool integration and system prompts
+- **Memory Buffer**: 30-turn conversation context for coherent interactions
+- **Language Model**: GPT-5 or equivalent for natural language processing and reasoning
+
+### Tool Integration Patterns
+- **RSS Feed Reader**: Get latest news from configurable sources (BBC, Al Jazeera, TechCrunch)
+- **Weather API**: OpenMeteo integration for location-based weather forecasts
+- **HTTP Request Tools**: Generic API integration with dynamic parameter handling
+- **Calculator Tools**: Basic computation and data processing capabilities
+
+### System Prompt Design
+- **Personality**: Friendly, educational, and enthusiastic about automation capabilities
+- **Educational Focus**: Explain AI agent concepts and n8n workflow power to users
+- **Tool Usage**: Demonstrate one tool at a time with clear result presentation
+- **Conversational Style**: Maintain natural dialogue while showcasing automation benefits
+
+### Demo and Educational Purpose
+- **Showcase Function**: Demonstrate conversational AI capabilities within n8n workflows
+- **Learning Tool**: Help users understand agent capabilities and automation potential
+- **Best Practices**: Illustrate tool-focused agent design (under 10-15 tools) for reliability
+- **Fallback Handling**: Graceful degradation when information is unavailable
+
+@real-estate-ai-literature-review/AI-Agent.json

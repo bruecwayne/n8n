@@ -1,0 +1,53 @@
+---
+description: Workflow documentation strategies and example discovery for development guidance
+globs: Documentation/*.md,workflows/*.json,create_categories.py
+alwaysApply: false
+---
+
+## Documentation Patterns
+
+### Category-Based Documentation
+- **16 Business Categories**: Document by business function (AI, Communication, Data Processing)
+- **Integration Examples**: Real workflow examples for each service (Google, OpenAI, etc.)
+- **Complexity Levels**: Simple (≤5 nodes), medium (6-15 nodes), complex (16+ nodes)
+- **Trigger Types**: Webhook, scheduled, manual, multi-trigger examples
+
+### Example Discovery
+- **Use Case Search**: Find by business need - customer onboarding, invoice processing
+- **Integration Combinations**: Patterns like "Slack + Google Sheets + OpenAI"
+- **Node Patterns**: Specific node combinations and flow control patterns
+- **Performance Benchmarks**: High-performance patterns for scaling
+
+### Workflow Analysis
+- **Node Breakdown**: Most frequent nodes and configurations
+- **Error Patterns**: Common failure points and solutions
+- **Optimization**: Before/after performance improvement examples
+- **Best Practices**: Proven patterns for reliability and security
+
+### Multi-Agent Documentation
+- **Orchestration**: Coordinating specialized workflows
+- **Communication**: Agent-to-agent via webhooks and shared data
+- **Scalability**: Handling increased load across agents
+- **Error Recovery**: Agent failure handling and fallbacks
+
+### Integration Guides
+- **API Integration**: Authentication, rate limiting, error handling
+- **Database Patterns**: Synchronization, transformation, storage
+- **Communication**: Chatbots, notifications, messaging automation
+- **File Processing**: Document processing, image manipulation
+
+### Development Templates
+- **Starter Templates**: Basic templates for common patterns
+- **Advanced Examples**: Complex workflows with error handling
+- **Testing Templates**: Validation workflows for integrations
+- **Monitoring Templates**: Workflows monitoring system health
+
+### Maintenance
+- **Automated Updates**: API endpoints for documentation sync
+- **Version Tracking**: Documentation versions with workflow versions
+- **User Contributions**: Community contributions with review
+- **Search Optimization**: Structured for easy discovery
+
+@Documentation/category-structure.md
+@Documentation/api-endpoints.md
+@Documentation/ai-agent-development.md

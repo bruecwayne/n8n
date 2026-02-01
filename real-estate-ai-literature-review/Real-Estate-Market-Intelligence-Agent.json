@@ -1,0 +1,400 @@
+
+{
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "78c6a607-7a7f-4e12-abbf-928980e5cb08",
+      "name": "Market Intelligence Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        816,
+        -176
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {
+          "maxTokens": 2500,
+          "temperature": 0.4
+        }
+      },
+      "id": "3373fa0b-ce20-4d04-8744-b97182f8c0d0",
+      "name": "Intelligence Synthesis Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        688,
+        32
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "R4kqYMlb7z36skUH",
+          "name": "OpenAi-Agentic-Assets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $fromAI('sources', 'News sources: https://feeds.bloomberg.com/reuters/news.rss, https://feeds.reuters.com/reuters/businessNews, https://feeds.wsj.com/wsj/xml/rss/3_7041.xml', 'string').split(',')[0] || 'https://feeds.bloomberg.com/reuters/news.rss' }}",
+        "options": {}
+      },
+      "id": "6638e286-91d8-46e7-a0c1-7b3b3050122b",
+      "name": "Market News Monitor",
+      "type": "n8n-nodes-base.rssFeedReadTool",
+      "position": [
+        1824,
+        320
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "toolDescription": "Analyzes Twitter, Reddit, LinkedIn for real estate discussions, investor confidence, and industry buzz using sentiment analysis APIs",
+        "url": "={{ $fromAI('sentimentApi', 'Sentiment API endpoint for social media analysis', 'string') || 'https://api.twitter.com/2/tweets/search/recent' }}",
+        "sendQuery": true,
+        "parametersQuery": {
+          "values": [
+            {}
+          ]
+        },
+        "optimizeResponse": true
+      },
+      "id": "4373c9e2-35f9-442a-ae2e-b0adeb86a34f",
+      "name": "Sentiment Analysis Engine",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [
+        1488,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "toolDescription": "Tracks FRED API data for employment, interest rates, construction spending, and local market indicators",
+        "url": "https://api.stlouisfed.org/fred/series/observations",
+        "sendQuery": true,
+        "parametersQuery": {
+          "values": [
+            {}
+          ]
+        },
+        "optimizeResponse": true
+      },
+      "id": "29b4619f-e367-45d2-94fd-0471b4287c45",
+      "name": "Macro Indicator Tracker",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [
+        1664,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "description": "Process financial news articles to extract key information, sentiment, and market impact analysis. Perform NLP analysis on news content to identify trends, company mentions, and financial metrics.",
+        "language": "python",
+        "pythonCode": "import re\nfrom typing import Dict, List, Any\nfrom datetime import datetime\nimport json\n\n# Financial news processing and NLP analysis\ndef analyze_financial_news(news_articles: List[Dict[str, Any]]) -> Dict[str, Any]:\n    \"\"\"\n    Analyze financial news articles for key insights and market sentiment.\n    \n    Args:\n        news_articles: List of news article dictionaries with title, content, date, source\n    \n    Returns:\n        Dictionary with analysis results\n    \"\"\"\n    if not news_articles:\n        return {\"error\": \"No news articles provided for analysis\"}\n    \n    # Initialize analysis results\n    analysis_results = {\n        \"total_articles\": len(news_articles),\n        \"sentiment_summary\": {\"positive\": 0, \"negative\": 0, \"neutral\": 0},\n        \"key_topics\": [],\n        \"company_mentions\": [],\n        \"market_impacts\": [],\n        \"trending_sectors\": [],\n        \"processed_articles\": []\n    }\n    \n    # Financial keywords for topic identification\n    financial_keywords = {\n        \"real_estate\": [\"real estate\", \"property\", \"commercial\", \"residential\", \"REIT\", \"CRE\"],\n        \"banking\": [\"bank\", \"lending\", \"mortgage\", \"interest rate\", \"fed\", \"federal reserve\"],\n        \"economy\": [\"GDP\", \"inflation\", \"employment\", \"unemployment\", \"recession\"],\n        \"markets\": [\"stock market\", \"dow jones\", \"s&p\", \"nasdaq\", \"volatility\"],\n        \"corporate\": [\"merger\", \"acquisition\", \"earnings\", \"quarterly\", \"revenue\"]\n    }\n    \n    # Company name patterns\n    company_indicators = [\"corp\", \"inc\", \"ltd\", \"llc\", \"group\", \"holdings\", \"financial\"]\n    \n    topic_counts = {sector: 0 for sector in financial_keywords.keys()}\n    company_counts = {}\n    \n    for article in news_articles:\n        title = article.get(\"title\", \"\").lower()\n        content = article.get(\"content\", \"\").lower()\n        full_text = title + \" \" + content\n        \n        # Topic analysis\n        article_topics = []\n        for sector, keywords in financial_keywords.items():\n            if any(keyword in full_text for keyword in keywords):\n                article_topics.append(sector)\n                topic_counts[sector] += 1\n        \n        # Company mention extraction\n        sentences = re.split(r'[.!?]+', content)\n        for sentence in sentences:\n            # Look for potential company names (capitalized words followed by company indicators)\n            words = sentence.split()\n            for i, word in enumerate(words):\n                if word and word[0].isupper():\n                    # Check if followed by company indicator\n                    remaining_words = words[i+1:i+4]  # Look ahead 3 words\n                    if any(indicator in \" \".join(remaining_words).lower() for indicator in company_indicators):\n                        company_name = word + \" \" + \" \".join(remaining_words).split()[0] if remaining_words else word\n                        company_counts[company_name] = company_counts.get(company_name, 0) + 1\n                        break\n        \n        # Sentiment analysis (simplified)\n        positive_words = [\"gain\", \"rise\", \"increase\", \"growth\", \"profit\", \"strong\", \"bullish\", \"up\"]\n        negative_words = [\"loss\", \"fall\", \"decrease\", \"decline\", \"weak\", \"bearish\", \"down\", \"crash\"]\n        \n        positive_count = sum(1 for word in positive_words if word in full_text)\n        negative_count = sum(1 for word in negative_words if word in full_text)\n        \n        if positive_count > negative_count:\n            sentiment = \"positive\"\n            analysis_results[\"sentiment_summary\"][\"positive\"] += 1\n        elif negative_count > positive_count:\n            sentiment = \"negative\"\n            analysis_results[\"sentiment_summary\"][\"negative\"] += 1\n        else:\n            sentiment = \"neutral\"\n            analysis_results[\"sentiment_summary\"][\"neutral\"] += 1\n        \n        # Market impact assessment\n        impact_keywords = [\"market moving\", \"significant impact\", \"major change\", \"breaking\", \"alert\"]\n        has_impact = any(keyword in full_text for keyword in impact_keywords)\n        \n        # Store processed article\n        processed_article = {\n            \"title\": article.get(\"title\", \"\"),\n            \"source\": article.get(\"source\", \"\"),\n            \"date\": article.get(\"date\", \"\"),\n            \"topics\": article_topics,\n            \"sentiment\": sentiment,\n            \"market_impact\": has_impact,\n            \"word_count\": len(full_text.split())\n        }\n        analysis_results[\"processed_articles\"].append(processed_article)\n    \n    # Summarize results\n    analysis_results[\"key_topics\"] = sorted(topic_counts.items(), key=lambda x: x[1], reverse=True)[:5]\n    analysis_results[\"company_mentions\"] = sorted(company_counts.items(), key=lambda x: x[1], reverse=True)[:10]\n    analysis_results[\"trending_sectors\"] = [sector for sector, count in analysis_results[\"key_topics\"] if count > 0]\n    \n    # Market impact summary\n    high_impact_articles = [art for art in analysis_results[\"processed_articles\"] if art[\"market_impact\"]]\n    analysis_results[\"market_impacts\"] = {\n        \"high_impact_articles\": len(high_impact_articles),\n        \"total_articles\": len(news_articles),\n        \"impact_ratio\": round(len(high_impact_articles) / len(news_articles), 3) if news_articles else 0\n    }\n    \n    return analysis_results\n\n# Parse input data\ntry:\n    news_data = query.get(\"news_articles\", [])\n    \n    # Handle different input formats\n    if isinstance(news_data, str):\n        try:\n            news_data = json.loads(news_data)\n        except:\n            # If not JSON, try to parse as simple list\n            news_data = [{\"title\": news_data, \"content\": \"\", \"source\": \"unknown\", \"date\": str(datetime.now())}]\n    \n    if not isinstance(news_data, list):\n        news_data = [news_data]\n    \n    result = analyze_financial_news(news_data)\n    return str(result)\n    \nexcept Exception as e:\n    return f\"Error processing financial news: {str(e)}\"",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"required\": [\"news_articles\"],\n  \"properties\": {\n    \"news_articles\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"title\": {\"type\": \"string\"},\n          \"content\": {\"type\": \"string\"},\n          \"source\": {\"type\": \"string\"},\n          \"date\": {\"type\": \"string\"}\n        }\n      },\n      \"description\": \"List of news articles with title, content, source, and date fields\"\n    }\n  }\n}"
+      },
+      "id": "7dc6c1b2-8944-4b1c-8f57-ca62943f8842",
+      "name": "Financial News Processor",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "position": [
+        704,
+        320
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "description": "Analyze social media sentiment and market mood from Twitter, Reddit, and LinkedIn data. Calculate sentiment scores, identify trending topics, and assess investor confidence levels.",
+        "language": "python",
+        "pythonCode": "import re\nfrom typing import Dict, List, Any\nfrom datetime import datetime, timedelta\nimport json\n\n# Social sentiment and market mood analysis\ndef analyze_market_sentiment(social_data: List[Dict[str, Any]]) -> Dict[str, Any]:\n    \"\"\"\n    Analyze social media data for market sentiment and investor mood.\n    \n    Args:\n        social_data: List of social media posts with text, platform, timestamp, engagement metrics\n    \n    Returns:\n        Dictionary with sentiment analysis results\n    \"\"\"\n    if not social_data:\n        return {\"error\": \"No social media data provided for analysis\"}\n    \n    # Initialize sentiment analysis\n    sentiment_results = {\n        \"total_posts\": len(social_data),\n        \"overall_sentiment\": {\"bullish\": 0, \"bearish\": 0, \"neutral\": 0},\n        \"sentiment_score\": 0.0,\n        \"confidence_level\": 0.0,\n        \"trending_topics\": [],\n        \"platform_breakdown\": {},\n        \"engagement_metrics\": {},\n        \"key_insights\": []\n    }\n    \n    # Sentiment keywords for real estate and markets\n    bullish_keywords = [\n        \"bullish\", \"bull\", \"buy\", \"long\", \"gains\", \"rally\", \"surge\", \"boom\", \"growth\", \"opportunity\",\n        \" undervalued\", \"cheap\", \"bargain\", \"dip\", \"buying opportunity\", \"moon\", \"pump\", \"green\"\n    ]\n    \n    bearish_keywords = [\n        \"bearish\", \"bear\", \"sell\", \"short\", \"losses\", \"crash\", \"dump\", \"decline\", \"drop\", \"fall\",\n        \"overvalued\", \"expensive\", \"bubble\", \"crash\", \"recession\", \"doom\", \"red\", \"bleed\"\n    ]\n    \n    # Real estate specific keywords\n    real_estate_keywords = [\n        \"real estate\", \"property\", \"housing\", \"home\", \"mortgage\", \"REIT\", \"commercial real estate\",\n        \"residential\", \"apartment\", \"condo\", \"house\", \"rental\", \"lease\", \"CRE\", \"multifamily\"\n    ]\n    \n    platform_sentiment = {}\n    topic_counts = {}\n    total_engagement = 0\n    \n    for post in social_data:\n        text = post.get(\"text\", \"\").lower()\n        platform = post.get(\"platform\", \"unknown\")\n        engagement = post.get(\"engagement\", 0) or post.get(\"likes\", 0) + post.get(\"retweets\", 0) + post.get(\"replies\", 0)\n        \n        # Initialize platform tracking\n        if platform not in platform_sentiment:\n            platform_sentiment[platform] = {\"bullish\": 0, \"bearish\": 0, \"neutral\": 0, \"total\": 0}\n        \n        platform_sentiment[platform][\"total\"] += 1\n        total_engagement += engagement\n        \n        # Check for real estate relevance\n        is_real_estate = any(keyword in text for keyword in real_estate_keywords)\n        if not is_real_estate:\n            continue  # Skip non-real estate posts\n        \n        # Sentiment analysis\n        bullish_score = sum(1 for keyword in bullish_keywords if keyword in text)\n        bearish_score = sum(1 for keyword in bearish_keywords if keyword in text)\n        \n        # Weighted sentiment based on engagement\n        weight = 1 + (engagement / 100)  # Base weight of 1, increased by engagement\n        \n        if bullish_score > bearish_score:\n            sentiment = \"bullish\"\n            sentiment_results[\"overall_sentiment\"][\"bullish\"] += weight\n            platform_sentiment[platform][\"bullish\"] += weight\n        elif bearish_score > bullish_score:\n            sentiment = \"bearish\"\n            sentiment_results[\"overall_sentiment\"][\"bearish\"] += weight\n            platform_sentiment[platform][\"bearish\"] += weight\n        else:\n            sentiment = \"neutral\"\n            sentiment_results[\"overall_sentiment\"][\"neutral\"] += weight\n            platform_sentiment[platform][\"neutral\"] += weight\n        \n        # Extract hashtags and topics\n        hashtags = re.findall(r'#(\\w+)', text)\n        for hashtag in hashtags:\n            hashtag = hashtag.lower()\n            if any(re_keyword in hashtag for re_keyword in ['realestate', 'realtor', 'property', 'housing', 'reit', 'cre']):\n                topic_counts[hashtag] = topic_counts.get(hashtag, 0) + weight\n    \n    # Calculate overall sentiment score (-1 to 1, where 1 is most bullish)\n    total_bullish = sentiment_results[\"overall_sentiment\"][\"bullish\"]\n    total_bearish = sentiment_results[\"overall_sentiment\"][\"bearish\"]\n    total_sentiment = total_bullish + total_bearish + sentiment_results[\"overall_sentiment\"][\"neutral\"]\n    \n    if total_sentiment > 0:\n        sentiment_results[\"sentiment_score\"] = round((total_bullish - total_bearish) / total_sentiment, 3)\n    \n    # Calculate confidence level based on data volume and consistency\n    data_points = sum(platform[\"total\"] for platform in platform_sentiment.values())\n    sentiment_variance = total_bullish + total_bearish  # Total non-neutral sentiment\n    \n    if data_points > 0:\n        confidence = min(1.0, data_points / 100) * (1 - abs(sentiment_results[\"sentiment_score\"]) * 0.3)  # Penalize extreme scores slightly\n        sentiment_results[\"confidence_level\"] = round(confidence, 3)\n    \n    # Get trending topics\n    sentiment_results[\"trending_topics\"] = sorted(topic_counts.items(), key=lambda x: x[1], reverse=True)[:10]\n    \n    # Platform breakdown\n    sentiment_results[\"platform_breakdown\"] = {\n        platform: {\n            **stats,\n            \"percentage\": round(stats[\"total\"] / len(social_data) * 100, 1) if len(social_data) > 0 else 0\n        }\n        for platform, stats in platform_sentiment.items()\n    }\n    \n    # Engagement metrics\n    sentiment_results[\"engagement_metrics\"] = {\n        \"total_engagement\": total_engagement,\n        \"avg_engagement_per_post\": round(total_engagement / len(social_data), 2) if len(social_data) > 0 else 0,\n        \"high_engagement_posts\": len([p for p in social_data if (p.get(\"engagement\", 0) or 0) > 50])\n    }\n    \n    # Generate key insights\n    insights = []\n    if sentiment_results[\"sentiment_score\"] > 0.2:\n        insights.append(\"Strong bullish sentiment detected in real estate discussions\")\n    elif sentiment_results[\"sentiment_score\"] < -0.2:\n        insights.append(\"Bearish sentiment prevalent in real estate social media\")\n    else:\n        insights.append(\"Neutral to mixed sentiment in real estate markets\")\n    \n    if sentiment_results[\"confidence_level\"] > 0.7:\n        insights.append(\"High confidence in sentiment analysis based on data volume\")\n    elif sentiment_results[\"confidence_level\"] < 0.3:\n        insights.append(\"Low confidence - limited social media data available\")\n    \n    sentiment_results[\"key_insights\"] = insights\n    \n    return sentiment_results\n\n# Parse input data\ntry:\n    social_data = query.get(\"social_posts\", [])\n    \n    # Handle different input formats\n    if isinstance(social_data, str):\n        try:\n            social_data = json.loads(social_data)\n        except:\n            return \"Error: Invalid social media data format. Expected JSON array of posts.\"\n    \n    if not isinstance(social_data, list):\n        social_data = [social_data]\n    \n    result = analyze_market_sentiment(social_data)\n    return str(result)\n    \nexcept Exception as e:\n    return f\"Error analyzing market sentiment: {str(e)}\"",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"required\": [\"social_posts\"],\n  \"properties\": {\n    \"social_posts\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"text\": {\"type\": \"string\"},\n          \"platform\": {\"type\": \"string\", \"enum\": [\"twitter\", \"reddit\", \"linkedin\"]},\n          \"timestamp\": {\"type\": \"string\"},\n          \"engagement\": {\"type\": \"number\"},\n          \"likes\": {\"type\": \"number\"},\n          \"retweets\": {\"type\": \"number\"},\n          \"replies\": {\"type\": \"number\"}\n        }\n      },\n      \"description\": \"List of social media posts with text, platform, and engagement metrics\"\n    }\n  }\n}"
+      },
+      "id": "99430e04-539a-4221-a4e0-d5289590b146",
+      "name": "Market Mood Analyzer",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "position": [
+        848,
+        320
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "description": "Analyze economic indicators and market fundamentals from FRED API and other data sources. Calculate trends, identify anomalies, and assess market conditions using statistical analysis.",
+        "language": "python",
+        "pythonCode": "import numpy as np; return 'Market fundamentals analysis placeholder'",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{}"
+      },
+      "id": "909dd1e4-b4d6-4420-9fe7-1fc5e26d943a",
+      "name": "Market Fundamentals Engine",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "position": [
+        976,
+        320
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "content": "## Real Estate Market Intelligence Agent\n\n**Purpose**: Synthesizes diverse information sources to provide actionable market intelligence\n\n**Value**: Transforms overwhelming data streams into actionable insights for faster decision-making\n\n**Intelligence Sources**:\n- **News Aggregation**: Bloomberg, Reuters, WSJ Real Estate RSS feeds\n- **Social Sentiment**: Twitter, Reddit, LinkedIn market discussions\n- **Economic Indicators**: FRED API, local market data, employment stats\n\n**Analysis Tools**:\n- Financial News Processor (NLP, event extraction)\n- Market Mood Analyzer (sentiment analysis)\n- Market Fundamentals Engine (statistical modeling)\n- Intelligence Integrator (multimodal synthesis)\n- Market Alert System (anomaly detection)\n- LinkedIn Market Intelligence Post (social media distribution)\n- LinkedIn Intelligence API (advanced social networking)\n\n**Output**:\n- Market Intelligence Portal (real-time dashboards)\n- Personalized alerts and notifications\n- Customizable reporting for different user types\n- LinkedIn posts for market insights distribution\n\n**Stakeholders**: Real estate analysts, portfolio managers, developers, institutional investors, consultants",
+        "height": 920,
+        "width": 2160,
+        "color": 4
+      },
+      "id": "e605a5de-e363-401a-a899-ca3c8e0b6589",
+      "name": "Market Intelligence Documentation",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -128,
+        -368
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a Real Estate Market Intelligence Agent that synthesizes diverse information sources to provide actionable market intelligence. You transform overwhelming data streams into clear, informed decision-making tools.\n\nYour Intelligence Sources:\n- **News Aggregation**: RSS feeds from Bloomberg, Reuters, WSJ Real Estate\n- **Social Sentiment**: Twitter, Reddit, LinkedIn analysis for market mood\n- **Economic Indicators**: FRED API data, local market statistics\n- **Analysis Tools**: NLP processing, sentiment analysis, statistical modeling\n- **Social Distribution**: LinkedIn posting and networking for intelligence dissemination\n\nIntelligence Framework:\n1. **Data Collection**: Gather news, social sentiment, and economic data in parallel using RSS feeds, Twitter API, and FRED API\n2. **Initial Processing**: Each data type processed by specialized analysis tools (Financial News Processor, Market Mood Analyzer, Market Fundamentals Engine)\n3. **Synthesis**: Combine insights into coherent market narratives using multimodal LLM integration\n4. **Anomaly Detection**: Identify unusual patterns requiring attention with statistical process control\n5. **Distribution**: Generate real-time dashboards and personalized alerts via HTML portal\n6. **Feedback Loop**: User interactions refine future intelligence gathering parameters\n\nValue Proposition:\n- Transforms data streams into actionable insights\n- Enables faster, more informed decision-making\n- Provides early warning systems for market changes\n- Supports multiple stakeholder types with customized intelligence\n\nStakeholder Applications:\n- **Real Estate Analysts**: Market research and investment strategy\n- **Portfolio Managers**: Risk management and competitive intelligence\n- **Developers**: Market timing and opportunity identification\n- **Institutional Investors**: Due diligence and market monitoring"
+        }
+      },
+      "id": "38e46fa3-2d57-40a2-b593-028d522f3e24",
+      "name": "Market Intel Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1008,
+        -176
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "resource": "__CUSTOM_API_CALL__"
+      },
+      "id": "356297cd-8380-4b95-b62c-331a85d82db9",
+      "name": "LinkedIn Market Intelligence",
+      "type": "n8n-nodes-base.linkedInTool",
+      "position": [
+        1328,
+        320
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "BgjtHbRUheIc8zQO",
+          "name": "LinkedIn account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "WfEV0MArVpw5qviY",
+          "mode": "list",
+          "cachedResultName": "Agentic Assets - Main — Real Estate Market Intelligence Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1232,
+        192
+      ],
+      "id": "ff15c8be-34e1-45c8-96d4-56925a0c4d88",
+      "name": "Intelligence Integrator1"
+    },
+    {
+      "parameters": {
+        "description": "Monitor all data sources for anomalies, critical thresholds, and market alerts. Generate actionable notifications based on statistical analysis and predefined alert conditions.",
+        "language": "python",
+        "pythonCode": "import numpy as np; return 'Market alert system placeholder'",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{}"
+      },
+      "id": "7060b547-206a-45ca-85e4-7660bec9024b",
+      "name": "Market Alert Processing System",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "position": [
+        1136,
+        320
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {},
+      "id": "22878e0b-2597-47b1-ae13-4701ef0495c8",
+      "name": "Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        832,
+        32
+      ],
+      "typeVersion": 1.3
+    }
+  ],
+  "connections": {
+    "Market Intelligence Trigger": {
+      "main": [
+        [
+          {
+            "node": "Market Intel Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intelligence Synthesis Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Market Intel Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Market News Monitor": {
+      "ai_tool": [
+        [
+          {
+            "node": "Market Intel Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis Engine": {
+      "ai_tool": [
+        [
+          {
+            "node": "Market Intel Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Macro Indicator Tracker": {
+      "ai_tool": [
+        [
+          {
+            "node": "Market Intel Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Financial News Processor": {
+      "ai_tool": [
+        [
+          {
+            "node": "Market Intel Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Market Mood Analyzer": {
+      "ai_tool": [
+        [
+          {
+            "node": "Market Intel Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Market Fundamentals Engine": {
+      "ai_tool": [
+        [
+          {
+            "node": "Market Intel Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkedIn Market Intelligence": {
+      "ai_tool": [
+        [
+          {
+            "node": "Market Intel Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intelligence Integrator1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Market Intel Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Market Alert Processing System": {
+      "ai_tool": [
+        [
+          {
+            "node": "Market Intel Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Market Intel Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2bd918b407c290e8bb139d969f24518c6daf0a6ae9a8f56196275ae39545b380"
+  }
+}

@@ -1,0 +1,35 @@
+---
+description: Workflow development patterns using n8n's 365+ integrations and 16 categories
+globs: workflows/*.json,Documentation/category-structure.md,Documentation/business-process-automation.md
+alwaysApply: false
+---
+
+## Core Workflow Development Patterns
+
+### Category-Based Workflow Design
+- **Communication & Messaging** (321 workflows): Telegram, Discord, Slack webhooks for notifications and chat bots
+- **Business Process Automation** (77 workflows): Google Calendar/Cal.com scheduling, task management, workflow orchestration
+- **Data Processing & Analysis** (125 workflows): ETL pipelines with Google Sheets, databases, analytics platforms
+- **AI Agent Development** (4 workflows): Multi-agent systems with OpenAI/Anthropic, vector stores, intelligent automation
+- **Web Scraping & Data Extraction** (264 workflows): HTTP requests, APIs, data collection tools
+
+### Node Best Practices
+- **Triggers**: Webhook for APIs, Schedule for time-based, Manual for user-initiated workflows
+- **Actions**: HTTP Request for APIs, Code/JavaScript for transformation, Function items for logic
+- **Flow Control**: Split In Batches for bulk ops, Switch for conditions, Merge for data streams
+- **Integrations**: Prefer service-specific nodes (Google Drive, Slack) over generic HTTP requests
+
+### Multi-Agent Architectures
+- **Orchestrator Pattern**: ExecuteWorkflow node coordinates specialized agent workflows
+- **Chain of Thought**: Sequential OpenAI nodes with memory buffers for complex reasoning
+- **Parallel Processing**: Split In Batches for concurrent agent execution
+- **Feedback Loops**: Memory buffers for self-improvement cycles
+
+### Integration Examples
+- **AI**: OpenAI + Pinecone for RAG, Anthropic + LangChain for orchestration
+- **Communication**: Telegram + OpenAI chatbots, Slack + Google Calendar coordination
+- **Data**: PostgreSQL + Google Sheets sync, Airtable + Zapier automation
+- **Business**: HubSpot + Stripe sales, Trello + Gmail notifications
+
+@Documentation/category-structure.md
+@Documentation/business-process-automation.md

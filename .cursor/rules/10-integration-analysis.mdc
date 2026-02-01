@@ -1,0 +1,53 @@
+---
+description: Service integration patterns and API orchestration strategies for workflow development
+globs: context/def_categories.json,workflows/*.json,Documentation/api-endpoints.md
+alwaysApply: false
+---
+
+## Integration Ecosystem
+
+### Popular Integration Hubs
+- **Google Workspace**: Sheets (data), Calendar (scheduling), Drive (storage), Gmail (communication)
+- **Communication Stack**: Slack, Discord, Telegram for notifications; WhatsApp, SMS for engagement
+- **Database Layer**: PostgreSQL/MySQL (relational); Airtable, MongoDB (flexible)
+- **AI/ML Services**: OpenAI (generation), Anthropic (reasoning), Pinecone (vector search)
+- **Development Tools**: GitHub/GitLab (CI/CD), HTTP Request (custom APIs)
+
+### Integration Popularity
+- **Most Used**: HTTP Request, Google Sheets, OpenAI, Telegram/Slack
+- **Growing**: AI services, vector databases, specialized business tools
+- **Stable**: Core communication and data storage services
+- **Regional**: Services popular in specific regions (WeChat, LINE)
+
+### Cross-Service Patterns
+- **Data Flow**: API → Processing → Storage (HTTP Request → Code → Database)
+- **Notifications**: Trigger → Logic → Multi-channel (Webhook → Switch → Slack/Email)
+- **ETL Pipelines**: Extract → Transform → Load (API/Database → Code → Storage)
+- **Approvals**: Request → Review → Action (Form → Human review → Response)
+
+### Authentication Patterns
+- **OAuth Services**: Google, Microsoft, Slack - refresh tokens and scopes
+- **API Key Services**: OpenAI, Stripe, Twilio - environment variables and rotation
+- **Webhook Verification**: Validate with signatures (Stripe, GitHub)
+- **Rate Limiting**: Delays and queuing for API management
+
+### Error Handling
+- **Timeout Management**: Different expectations for webhooks vs APIs
+- **Retry Logic**: Exponential backoff for transient failures
+- **Fallback Mechanisms**: Continue with reduced functionality on failures
+- **Error Notification**: Alert when critical integrations fail
+
+### Performance Optimization
+- **Batch Operations**: Use bulk APIs (Google Sheets, databases)
+- **Caching**: Cache frequently accessed data to reduce API calls
+- **Async Processing**: Webhooks and polling for long-running operations
+- **Connection Pooling**: Optimize database and HTTP connections
+
+### Service Compatibility
+- **Version Management**: Track and update API versions
+- **Deprecation Handling**: Monitor deprecated endpoints and migrations
+- **Breaking Changes**: Test workflows during API changes
+- **Fallback Services**: Alternative services for critical integrations
+
+@context/def_categories.json
+@Documentation/api-endpoints.md

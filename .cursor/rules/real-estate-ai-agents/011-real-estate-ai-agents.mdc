@@ -1,0 +1,41 @@
+---
+description: Real estate AI agent workflow design and n8n implementation patterns
+globs: real-estate-ai-literature-review/**
+alwaysApply: false
+---
+
+## Real Estate AI Agent Architecture
+
+### Multi-Agent Workflow Design
+- Structure agents hierarchically: Orchestrator → Specialized Agents → Tool Execution
+- Use webhook triggers for real-time agent activation and scheduled triggers for monitoring
+- Implement conversation memory (BufferWindow) with 20-30 turn context for complex interactions
+- Connect agents via shared memory buffers and workflow orchestration nodes
+
+### Agent Tool Integration Patterns
+- **HTTP Request Tools**: Use for external APIs (CoStar, FRED, OpenMeteo) with proper authentication
+- **Calculator Tools**: Implement for financial modeling, sentiment analysis, and risk calculations
+- **Workflow Tools**: Enable agent-to-agent communication and complex multi-step processes
+- **Vector Store Tools**: Integrate RAG capabilities for document retrieval and knowledge base access
+
+### n8n Workflow Best Practices
+- **Node Connections**: Use clear data flow from triggers → agents → tools → outputs
+- **Error Handling**: Implement proper error paths and fallback mechanisms
+- **Memory Management**: Configure appropriate context windows and cleanup strategies
+- **Credential Security**: Never expose API keys in workflow JSON; use environment variables
+
+### Real Estate Domain Integration
+- **Data Sources**: Integrate CoStar, REIS, Zillow, FRED API, and local government databases
+- **Analysis Types**: Support multimodal analysis (text, images, geospatial, financial data)
+- **Output Formats**: Generate PDF reports, HTML dashboards, and structured JSON responses
+- **Compliance**: Implement audit trails and data privacy protections
+
+### Agent Specialization Patterns
+- **Assessment Agents**: Focus on property valuation and condition analysis
+- **Underwriting Agents**: Handle due diligence and risk assessment workflows
+- **Portfolio Agents**: Manage investment optimization and market timing
+- **Intelligence Agents**: Provide market research and sentiment analysis
+- **Orchestrator Agents**: Coordinate multiple specialized agents
+
+@real-estate-ai-literature-review/Additional-Agent-Workflow-Descriptions.md
+@real-estate-ai-literature-review/Multi-agent-workflow-orchestrator.json

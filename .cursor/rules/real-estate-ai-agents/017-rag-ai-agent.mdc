@@ -1,0 +1,33 @@
+---
+description: Retrieval-augmented generation agent with vector store integration
+globs: real-estate-ai-literature-review/RAG-AI-Agent.json
+alwaysApply: false
+---
+
+## RAG Agent Architecture
+
+### Vector Store Integration
+- **Pinecone Vector Store**: Cloud-hosted vector database for document embeddings
+- **Google Gemini Embeddings**: High-quality embedding generation for semantic search
+- **Vector Store Tool**: LangChain tool for retrieving relevant document information
+- **Retrieval Strategy**: Semantic similarity search with configurable result limits
+
+### Knowledge Base Setup
+- **Document Processing**: Chunk and embed company documents for retrieval
+- **Index Management**: Maintain separate indexes for different document types
+- **Embedding Quality**: Use production-grade embedding models for accurate retrieval
+- **Update Mechanisms**: Support for incremental document updates and re-indexing
+
+### Agent Reasoning Flow
+- **Query Analysis**: Understand user intent and identify relevant knowledge domains
+- **Retrieval Phase**: Query vector store for relevant document chunks and context
+- **Synthesis Phase**: Combine retrieved information with agent reasoning capabilities
+- **Response Generation**: Provide accurate, contextual answers based on retrieved knowledge
+
+### HR Assistant Specialization
+- **Domain Focus**: Employee questions about company policies and procedures
+- **Fallback Strategy**: Clear messaging when information is unavailable in documents
+- **Audit Compliance**: Maintain retrieval traces for compliance and accuracy verification
+- **Context Preservation**: Use conversation memory for multi-turn policy discussions
+
+@real-estate-ai-literature-review/RAG-AI-Agent.json

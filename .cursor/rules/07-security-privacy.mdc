@@ -1,0 +1,46 @@
+---
+description: Workflow security practices and credential management for safe automation development
+globs: workflows/*.json,Documentation/security-privacy.md,README.md
+alwaysApply: false
+---
+
+## Credential Management
+
+### Secure Authentication
+- **Environment Variables**: Store API keys, tokens, credentials as environment variables, never in JSON
+- **Credential Rotation**: Automatic token refresh for Google, Microsoft, OAuth providers
+- **Service Accounts**: Dedicated accounts with minimal required permissions
+- **Least Privilege**: Give workflows only necessary access
+
+### Data Privacy
+- **PII Handling**: Avoid storing/logging personally identifiable information
+- **Data Minimization**: Collect/process only minimum required data
+- **Retention Policies**: Automatic cleanup of temporary data and execution history
+- **Compliance**: Design for GDPR, CCPA, privacy regulations
+
+### Secure Design
+- **Input Validation**: Code nodes prevent injection attacks and malformed data
+- **Output Sanitization**: Remove sensitive information before external transmission
+- **Error Handling**: Avoid exposing internal details or credentials
+- **Rate Limiting**: Prevent API abuse and respect service limits
+
+### Multi-Agent Security
+- **Agent Isolation**: Separate credentials/permissions to limit breach impact
+- **Communication Security**: Encrypted channels for inter-agent communication
+- **Audit Trails**: Comprehensive logging without exposing sensitive data
+- **Access Control**: Control agent communication and resource access
+
+### Development Practices
+- **Test Environments**: Separate credentials and test data for dev/testing
+- **Code Review**: Review for security vulnerabilities and credential exposure
+- **Updates**: Keep integrations updated to address vulnerabilities
+- **Monitoring**: Monitor for unusual workflow behavior indicating compromise
+
+### API Security
+- **Webhook Security**: Validate with signatures, tokens, IP whitelisting
+- **Authentication**: Use OAuth, API keys, JWT for external API calls
+- **SSL/TLS**: Ensure HTTPS for all external communications
+- **Request Validation**: Validate responses and handle auth failures
+
+@Documentation/security-privacy.md
+@README.md

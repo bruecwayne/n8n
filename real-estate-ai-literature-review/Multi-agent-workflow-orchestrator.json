@@ -1,0 +1,410 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "toolDescription": "Handles all email outreach for PR, brand partnerships, collaborations, and local business relationships",
+          "text": "={{ $fromAI('Email_Request', '', 'string') }}",
+          "options": {
+            "systemMessage": "You are a Professional PR & Partnership Specialist. You craft compelling outreach emails for:\n\n🤝 Brand Partnerships: Collaboration proposals, sponsorship pitches\n🏢 Local Business Outreach: Restaurant partnerships, local brand deals\n📝 PR Communications: Product launches, media relations, press inquiries\n💼 Follow-up Sequences: Professional, persistent without being pushy\n📊 Performance Tracking: Subject line optimization, response rate improvement\n\nEmail Structure Expertise:\n- Compelling subject lines\n- Personalized openings\n- Clear value propositions\n- Professional yet warm tone\n- Strong call-to-actions\n- Follow-up strategies\n\nInclude specific details like rates, deliverables, timelines, and mutual benefits. Always maintain professionalism while showing personality."
+          }
+        },
+        "id": "a4e289e2-72fd-4c78-b75d-c7bbb85d64bb",
+        "name": "Email Agent",
+        "type": "@n8n/n8n-nodes-langchain.agentTool",
+        "position": [
+          752,
+          304
+        ],
+        "typeVersion": 2.2
+      },
+      {
+        "parameters": {
+          "toolDescription": "Manages content distribution across multiple social media platforms with platform-specific optimization",
+          "text": "={{ $fromAI('Platform_Request', '', 'string') }}",
+          "options": {
+            "systemMessage": "You are a Multi-Platform Distribution Specialist managing content across all social media platforms. You handle:\n\n📱 TikTok: Short-form videos, trending sounds, hashtag challenges\n📸 Instagram: Posts, Stories, Reels, IGTV optimization\n🐦 Twitter: Thread creation, trending topics, real-time engagement\n💼 LinkedIn: Professional content, thought leadership, networking\n📌 Pinterest: Visual discovery, SEO optimization, board strategy\n🎵 YouTube: Long-form content, shorts, community posts\n\nPlatform Optimization:\n- Format adaptation (aspect ratios, lengths, styles)\n- Timing optimization (best posting times per platform)\n- Cross-platform content repurposing\n- Platform-specific features utilization\n- Scheduling and automation setup\n\nProvide specific posting instructions, optimal times, and platform-adapted content versions."
+          }
+        },
+        "id": "67c7a938-6e3e-4064-86a9-59d376ba94e7",
+        "name": "Platform Manager Agent",
+        "type": "@n8n/n8n-nodes-langchain.agentTool",
+        "position": [
+          1120,
+          304
+        ],
+        "typeVersion": 2.2
+      },
+      {
+        "parameters": {},
+        "id": "889475a9-d3f0-4b94-9b9e-b28979132537",
+        "name": "Memory1",
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "position": [
+          400,
+          112
+        ],
+        "typeVersion": 1.3
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4o",
+            "cachedResultName": "gpt-4o"
+          },
+          "options": {
+            "maxTokens": 2000,
+            "temperature": 0.7
+          }
+        },
+        "id": "588402a2-829c-47d1-a8cf-8cfff7002c14",
+        "name": "OpenAI Model",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "position": [
+          272,
+          112
+        ],
+        "typeVersion": 1.2,
+        "credentials": {
+          "openAiApi": {
+            "id": "R4kqYMlb7z36skUH",
+            "name": "OpenAi-Agentic-Assets"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "id": "0db14bc2-232f-4e2f-8b98-1a34e14e8d80",
+        "name": "Memory2",
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "position": [
+          432,
+          512
+        ],
+        "typeVersion": 1.3
+      },
+      {
+        "parameters": {},
+        "id": "cb21155a-32c6-46c5-9f81-5a7c11a557e2",
+        "name": "Memory3",
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "position": [
+          848,
+          496
+        ],
+        "typeVersion": 1.3
+      },
+      {
+        "parameters": {},
+        "id": "793b680d-c2be-4784-99d1-292785a9286e",
+        "name": "Memory4",
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "position": [
+          1200,
+          464
+        ],
+        "typeVersion": 1.3
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4o-mini",
+            "cachedResultName": "gpt-4o-mini"
+          },
+          "options": {
+            "maxTokens": 1500,
+            "temperature": 0.3
+          }
+        },
+        "id": "e68a221a-db2f-44dc-9036-4bcbd24a4544",
+        "name": "OpenAI Model2",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "position": [
+          272,
+          512
+        ],
+        "typeVersion": 1.2,
+        "credentials": {
+          "openAiApi": {
+            "id": "R4kqYMlb7z36skUH",
+            "name": "OpenAi-Agentic-Assets"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4o-mini",
+            "cachedResultName": "gpt-4o-mini"
+          },
+          "options": {
+            "maxTokens": 1000,
+            "temperature": 0.6
+          }
+        },
+        "id": "af1456e9-ed98-45b6-b6bf-b060554cd3a6",
+        "name": "OpenAI Model3",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "position": [
+          704,
+          496
+        ],
+        "typeVersion": 1.2,
+        "credentials": {
+          "openAiApi": {
+            "id": "R4kqYMlb7z36skUH",
+            "name": "OpenAi-Agentic-Assets"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4o-mini",
+            "cachedResultName": "gpt-4o-mini"
+          },
+          "options": {
+            "maxTokens": 1200,
+            "temperature": 0.5
+          }
+        },
+        "id": "02fd5be8-a843-479c-8584-415577a40e31",
+        "name": "OpenAI Model4",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "position": [
+          1056,
+          464
+        ],
+        "typeVersion": 1.2,
+        "credentials": {
+          "openAiApi": {
+            "id": "R4kqYMlb7z36skUH",
+            "name": "OpenAi-Agentic-Assets"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "toolDescription": "Analyzes social media performance, tracks metrics, and provides data-driven growth recommendations",
+          "text": "={{ $fromAI('Analytics_Request', '', 'string') }}",
+          "options": {
+            "systemMessage": "You are a Social Media Analytics & Growth Specialist. You provide data-driven insights for:\n\n📈 Performance Metrics: Engagement rates, reach, impressions, growth\n💰 ROI Analysis: Revenue from partnerships, cost per engagement, conversion tracking\n🎯 Audience Insights: Demographics, behavior patterns, optimal content types\n📊 Competitive Analysis: Benchmarking, industry trends, opportunity identification\n🔍 Content Analysis: Top performing posts, viral factors, optimization opportunities\n📅 Growth Strategy: Monthly goals, KPI tracking, strategic recommendations\n\nAnalytics Focus Areas:\n- Engagement rate optimization\n- Follower growth patterns\n- Content performance ranking\n- Brand partnership ROI\n- Platform-specific metrics\n- Trend identification and forecasting\n\nProvide actionable insights with specific recommendations for improvement and growth."
+          }
+        },
+        "id": "46d986cd-b4c6-47d0-a975-d5e6e781df93",
+        "name": "CoStar Data Agent",
+        "type": "@n8n/n8n-nodes-langchain.agentTool",
+        "position": [
+          336,
+          336
+        ],
+        "typeVersion": 2.2
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "2efa65fd-f57e-498d-833d-875761326786",
+          "responseMode": "responseNode",
+          "options": {
+            "allowedOrigins": "*"
+          }
+        },
+        "id": "d22dbaa0-d73d-4cf9-82bf-1a7ebd77c449",
+        "name": "Chat Input",
+        "type": "n8n-nodes-base.webhook",
+        "position": [
+          288,
+          -96
+        ],
+        "typeVersion": 2,
+        "webhookId": "2efa65fd-f57e-498d-833d-875761326786"
+      },
+      {
+        "parameters": {
+          "options": {
+            "responseCode": 200
+          }
+        },
+        "id": "1d9df1b2-30b4-4f97-8afd-b1847e0913cf",
+        "name": "Reponse",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "position": [
+          848,
+          -96
+        ],
+        "typeVersion": 1.1
+      },
+      {
+        "parameters": {
+          "text": "={{ $json.query }}",
+          "options": {
+            "systemMessage": "You are a Social Media Manager AI that delegates tasks to specialized agents. Analyze the user's request and decide which agent(s) to use:\n\n🎨 ContentCreator: For captions, hashtags, post ideas, TikTok scripts, creative content\n📧 EmailOutreach: For PR emails, brand partnerships, collaboration outreach, local business contact\n📱 PlatformManager: For posting content across platforms, scheduling, cross-platform distribution\n📊 AnalyticsAgent: For performance metrics, engagement analysis, growth tracking, ROI reports\n💬 CommunityManager: For responding to comments, managing DMs, community engagement\n\nChoose the most appropriate agent(s) and send clear, specific instructions to them. You can use multiple agents for complex requests."
+          }
+        },
+        "id": "75e0fdbf-ffa5-4a16-89f3-fdc592b0784d",
+        "name": "Orchestrator Agent",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "position": [
+          512,
+          -96
+        ],
+        "typeVersion": 2.2
+      }
+    ],
+    "connections": {
+      "Email Agent": {
+        "ai_tool": [
+          [
+            {
+              "node": "Orchestrator Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Platform Manager Agent": {
+        "ai_tool": [
+          [
+            {
+              "node": "Orchestrator Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Memory1": {
+        "ai_memory": [
+          [
+            {
+              "node": "Orchestrator Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Orchestrator Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Memory2": {
+        "ai_memory": [
+          [
+            {
+              "node": "CoStar Data Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Memory3": {
+        "ai_memory": [
+          [
+            {
+              "node": "Email Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Memory4": {
+        "ai_memory": [
+          [
+            {
+              "node": "Platform Manager Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Model2": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "CoStar Data Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Model3": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Email Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Model4": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Platform Manager Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "CoStar Data Agent": {
+        "ai_tool": [
+          [
+            {
+              "node": "Orchestrator Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Chat Input": {
+        "main": [
+          [
+            {
+              "node": "Orchestrator Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Orchestrator Agent": {
+        "main": [
+          [
+            {
+              "node": "Reponse",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {},
+    "meta": {
+      "instanceId": "2bd918b407c290e8bb139d969f24518c6daf0a6ae9a8f56196275ae39545b380"
+    }
+  }
