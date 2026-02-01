@@ -1,52 +1,56 @@
-version: '3.8'
-
 services:
-  n8n-workflows:
-    build: .
+  # N8N Workflows Documentation Service
+  workflows-docs:
+    image: workflows-doc:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: n8n-workflows-docs
     ports:
       - "8000:8000"
     volumes:
-      # Persist database between container restarts
-      - ./database:/app/database
-      # Mount workflows directory for easy updates
-      - ./workflows:/app/workflows:ro
-      # Mount context for category definitions
-      - ./context:/app/context:ro
+      - workflows-db:/app/database
+      - workflows-logs:/app/logs
     environment:
-      - PYTHONUNBUFFERED=1
-      - WORKFLOW_DB_PATH=/app/database/workflows.db
+      - ENVIRONMENT=production
+      - LOG_LEVEL=info
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/stats"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+    networks:
+      - workflows-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.workflows-docs.rule=Host(`localhost`)"
+      - "traefik.http.services.workflows-docs.loadbalancer.server.port=8000"
 
-  # Alternative: Use pre-built Python image if you don't want to build
-  n8n-workflows-prebuilt:
-    image: python:3.11-slim
-    container_name: n8n-workflows-prebuilt
-    profiles:
-      - prebuilt
-    working_dir: /app
-    command: >
-      sh -c "
-        apt-get update &&
-        apt-get install -y curl sqlite3 &&
-        pip install -r requirements.txt &&
-        python run.py --host 0.0.0.0 --port 8000
-      "
+  # Optional: Traefik reverse proxy for production
+  reverse-proxy:
+    image: traefik:v2.10
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=admin@example.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
-      - "8000:8000"
+      - "80:80"
+      - "443:443"
+      - "8080:8080"  # Traefik dashboard
     volumes:
-      - .:/app
-    environment:
-      - PYTHONUNBUFFERED=1
-      - WORKFLOW_DB_PATH=/app/database/workflows.db
-    restart: unless-stopped
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+    networks:
+      - workflows-network
+    profiles:
+      - production
 
 networks:
-  default:
-    name: n8n-workflows-net
+  workflows-network:
+    driver: bridge
+
+volumes:
+  workflows-db:
+  workflows-logs:
