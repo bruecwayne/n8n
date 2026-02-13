@@ -77,7 +77,7 @@ async function runBrowserless(
 
   const url = new URL(`${browserlessUrl}/function`);
   url.searchParams.set("token", browserlessToken);
-  url.searchParams.set("stealth", "true"); // puppeteer-extra stealth
+  url.searchParams.set("launch", JSON.stringify({ stealth: true })); // puppeteer-extra stealth
 
   const response = await fetch(url.toString(), {
     method: "POST",
@@ -107,8 +107,10 @@ const BROWSER_HELPERS = `
       const start = Date.now();
       while (Date.now() - start < timeout) {
         for (const sel of selectors) {
-          const el = await page.$(sel);
-          if (el) return { el, selector: sel };
+          try {
+            const el = await page.$(sel);
+            if (el) return { el, selector: sel };
+          } catch { /* invalid CSS selector, skip */ }
         }
         await new Promise(r => setTimeout(r, 300));
       }
@@ -533,17 +535,33 @@ function getEYDAPScraperCode(): string {
           'button.btn-primary',
           'a.btn-primary',
           '#loginBtn',
-          'button:has-text("Είσοδος")',
-          'button:has-text("Login")',
+          'button[aria-label="Είσοδος"]',
+          'button[aria-label="Login"]',
         ];
-        const submitBtn = await helpers.waitAny(page, submitSelectors, 5000);
-        if (submitBtn) {
+        let submitBtn = await helpers.waitAny(page, submitSelectors, 5000);
+        // Fallback: find button by visible text (Puppeteer-compatible, no :has-text)
+        if (!submitBtn) {
+          const btnHandle = await page.evaluateHandle(() => {
+            const btns = [...document.querySelectorAll('button, input[type="submit"], a.btn')];
+            return btns.find(b => /Είσοδος|Login|Σύνδεση/i.test(b.textContent || b.value || '')) || null;
+          });
+          const asElement = btnHandle.asElement();
+          if (asElement) {
+            debug.push({ step: 'submit_via_text_match' });
+            await Promise.all([
+              helpers.waitNavOrSelector(page, ['[class*="account"]', '[class*="bill"]', '.error', '[role="alert"]'], 30000),
+              asElement.click(),
+            ]);
+            submitBtn = true; // flag that we already clicked
+          }
+        }
+        if (submitBtn && submitBtn.selector) {
           await Promise.all([
             helpers.waitNavOrSelector(page, ['[class*="account"]', '[class*="bill"]', '.error', '[role="alert"]'], 30000),
             page.click(submitBtn.selector),
           ]);
-        } else {
-          // Fallback: press Enter
+        } else if (!submitBtn) {
+          // Final fallback: press Enter
           await page.keyboard.press('Enter');
           await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 }).catch(() => {});
         }
@@ -1114,20 +1132,27 @@ function getAADEScraperCode(): string {
           }
 
           // Strategy B: look for amnt1, amnt3 fields (TaxisNet specific)
+          // These may be <input> (.value) or <span>/<td> (.textContent)
           if (results.length === 0) {
-            const amnt1 = document.querySelector('#amnt1');
-            const amnt3 = document.querySelector('#amnt3');
-            if (amnt1 || amnt3) {
-              const amt = parseFloat(((amnt1 || amnt3).value || '0').replace(/\\./g, '').replace(',', '.'));
-              if (amt > 0) {
-                results.push({
-                  title: 'Φορολογική Οφειλή ΑΑΔΕ',
-                  amount: amt,
-                  due_date: '',
-                  reference_number: 'AADE-' + Date.now(),
-                  bill_type: 'tax',
-                });
+            try {
+              const amnt1 = document.querySelector('#amnt1');
+              const amnt3 = document.querySelector('#amnt3');
+              if (amnt1 || amnt3) {
+                const el = amnt1 || amnt3;
+                const rawVal = el.value || el.textContent || el.innerText || '0';
+                const amt = parseFloat(rawVal.replace(/\\./g, '').replace(',', '.'));
+                if (amt > 0) {
+                  results.push({
+                    title: 'Φορολογική Οφειλή ΑΑΔΕ',
+                    amount: amt,
+                    due_date: '',
+                    reference_number: 'AADE-' + Date.now(),
+                    bill_type: 'tax',
+                  });
+                }
               }
+            } catch (stratBErr) {
+              // Log but don't crash — Strategy C will try next
             }
           }
 
@@ -1228,24 +1253,39 @@ function getEFKAScraperCode(): string {
           const taxisnetBtnSelectors = [
             'a[href*="gsis"]',
             'a[href*="taxisnet"]',
-            'button:has-text("TaxisNet")',
-            'a:has-text("TaxisNet")',
-            'a:has-text("Taxisnet")',
             'input[value*="TaxisNet"]',
             '.taxisnet-btn',
             'a[class*="taxis"]',
             'button[class*="taxis"]',
           ];
-          const taxisBtn = await helpers.waitAny(page, taxisnetBtnSelectors, 10000);
+          let taxisBtn = await helpers.waitAny(page, taxisnetBtnSelectors, 10000);
 
-          if (taxisBtn) {
+          // Fallback: find TaxisNet button by visible text (Puppeteer-compatible)
+          if (!taxisBtn) {
+            const btnHandle = await page.evaluateHandle(() => {
+              const els = [...document.querySelectorAll('a, button, input[type="submit"]')];
+              return els.find(e => /TaxisNet|Taxisnet|taxisnet|TAXISNET/i.test(e.textContent || e.value || '')) || null;
+            });
+            const asElement = btnHandle.asElement();
+            if (asElement) {
+              debug.push({ step: 'click_taxisnet_sso', method: 'text_match' });
+              await Promise.all([
+                page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 }).catch(() => {}),
+                asElement.click(),
+              ]);
+              await new Promise(r => setTimeout(r, 2000));
+              taxisBtn = true; // flag that we already clicked
+            }
+          }
+
+          if (taxisBtn && taxisBtn.selector) {
             debug.push({ step: 'click_taxisnet_sso', selector: taxisBtn.selector });
             await Promise.all([
               page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 }).catch(() => {}),
               page.click(taxisBtn.selector),
             ]);
             await new Promise(r => setTimeout(r, 2000));
-          } else {
+          } else if (!taxisBtn) {
             // Maybe there's a form on the EFKA page itself, or auto-redirect
             debug.push({ step: 'no_taxisnet_button_found', trying: 'direct_gsis' });
             // Navigate directly to GSIS
@@ -1520,7 +1560,16 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { provider_account_id } = await req.json();
+    let body: { provider_account_id: string };
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ success: false, error: "Invalid JSON body", error_code: "BAD_REQUEST" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 },
+      );
+    }
+    const { provider_account_id } = body;
 
     // Load provider account with provider details
     const { data: account, error: accountError } = await supabase
@@ -1540,7 +1589,7 @@ serve(async (req) => {
       .eq("id", provider_account_id);
 
     // Create sync job record
-    const { data: syncJob } = await supabase
+    const { data: syncJob, error: syncJobError } = await supabase
       .from("sync_jobs")
       .insert({
         provider_account_id,
@@ -1550,6 +1599,10 @@ serve(async (req) => {
       })
       .select()
       .single();
+
+    if (syncJobError) {
+      console.error("Failed to create sync job:", syncJobError.message);
+    }
 
     // Decrypt credentials
     const encryptionKey = await getEncryptionKey();
@@ -1658,29 +1711,25 @@ serve(async (req) => {
     }
 
     // Finalize sync job
-    const finalStatus = result.success
-      ? "completed"
-      : result.error_code === "2FA_REQUIRED"
-        ? "failed"
-        : "failed";
+    if (syncJob) {
+      const finalStatus = result.success ? "completed" : "failed";
 
-    await supabase
-      .from("sync_jobs")
-      .update({
-        status: finalStatus,
-        completed_at: new Date().toISOString(),
-        duration_ms: syncJob
-          ? Date.now() - new Date(syncJob.created_at).getTime()
-          : 0,
-        bills_found: result.bills.length,
-        bills_new: billsNew,
-        bills_updated: billsUpdated,
-        error_code: result.error_code,
-        error_message: result.error,
-        debug_log: result.debug,
-        screenshot_url: screenshotUrl,
-      })
-      .eq("id", syncJob!.id);
+      await supabase
+        .from("sync_jobs")
+        .update({
+          status: finalStatus,
+          completed_at: new Date().toISOString(),
+          duration_ms: Date.now() - new Date(syncJob.created_at).getTime(),
+          bills_found: result.bills.length,
+          bills_new: billsNew,
+          bills_updated: billsUpdated,
+          error_code: result.error_code,
+          error_message: result.error,
+          debug_log: result.debug,
+          screenshot_url: screenshotUrl,
+        })
+        .eq("id", syncJob.id);
+    }
 
     // Update provider account status
     const accountStatus = result.success

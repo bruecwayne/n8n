@@ -111,7 +111,7 @@ serve(async (req) => {
       .select("id")
       .eq("user_id", user.id)
       .eq("provider_id", provider_id)
-      .single();
+      .maybeSingle();
 
     if (existing) {
       throw new Error("Provider already connected. Please disconnect first.");
