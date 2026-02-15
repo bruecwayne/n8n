@@ -67,23 +67,27 @@ interface ScraperResult {
 // Calls Browserless /function endpoint with stealth mode enabled.
 // Credentials are passed through the `context` object (NOT string
 // interpolation) so there is zero risk of JS injection.
+// Compatible with Browserless v2 (export default, {data,type} response).
 async function runBrowserless(
   code: string,
   context: Record<string, unknown>,
 ): Promise<ScraperResult> {
   const browserlessUrl = Deno.env.get("BROWSERLESS_URL")!;
   const browserlessToken = Deno.env.get("BROWSERLESS_TOKEN")!;
-  const timeout = Number(Deno.env.get("SCRAPER_TIMEOUT_MS") || "60000");
+  const timeout = Number(Deno.env.get("SCRAPER_TIMEOUT_MS") || "120000");
 
   const url = new URL(`${browserlessUrl}/function`);
   url.searchParams.set("token", browserlessToken);
-  url.searchParams.set("launch", JSON.stringify({ stealth: true })); // puppeteer-extra stealth
+  // Browserless v2: stealth via launch param, timeout via query param
+  url.searchParams.set("launch", JSON.stringify({ stealth: true }));
+  url.searchParams.set("timeout", String(timeout));
 
   const response = await fetch(url.toString(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ code, context }),
-    signal: AbortSignal.timeout(timeout),
+    // Safety net: abort fetch if Browserless doesn't respect its own timeout
+    signal: AbortSignal.timeout(timeout + 15000),
   });
 
   if (!response.ok) {
@@ -91,7 +95,14 @@ async function runBrowserless(
     throw new Error(`Browserless HTTP ${response.status}: ${body.slice(0, 200)}`);
   }
 
-  return response.json();
+  const raw = await response.json();
+
+  // Browserless v2 functions return { data, type } — unwrap if needed.
+  // v1 returns the plain object directly.
+  if (raw && typeof raw === "object" && "data" in raw && "type" in raw) {
+    return raw.data as ScraperResult;
+  }
+  return raw as ScraperResult;
 }
 
 // ---------------------------------------------------------------------------
@@ -214,7 +225,7 @@ function getDEHScraperCode(): string {
   return `
     ${BROWSER_HELPERS}
 
-    module.exports = async ({ page, context }) => {
+    export default async function({ page, context }) {
       const debug = [];
       let lastScreenshot = null;
 
@@ -439,7 +450,7 @@ function getDEHScraperCode(): string {
           debug.push({ step: 'account_page_bills', count: moreBills.length });
         }
 
-        return { success: true, bills, debug, screenshot: lastScreenshot };
+        return { data: { success: true, bills, debug, screenshot: lastScreenshot }, type: 'application/json' };
 
       } catch (error) {
         debug.push({ step: 'error', message: error.message });
@@ -447,9 +458,9 @@ function getDEHScraperCode(): string {
         const code = error.message.startsWith('LOGIN_FAILED') ? 'LOGIN_FAILED'
           : error.message.startsWith('LOGIN_FORM_NOT_FOUND') ? 'SCRAPER_BROKEN'
           : 'SCRAPER_ERROR';
-        return { success: false, bills: [], error: error.message, error_code: code, debug, screenshot: lastScreenshot };
+        return { data: { success: false, bills: [], error: error.message, error_code: code, debug, screenshot: lastScreenshot }, type: 'application/json' };
       }
-    };
+    }
   `;
 }
 
@@ -460,11 +471,12 @@ async function scrapeDEH(username: string, password: string): Promise<ScraperRes
 // ---------------------------------------------------------------------------
 // EYDAP (ΕΥΔΑΠ) – eydap.gr – ASP.NET MVC
 // ---------------------------------------------------------------------------
-// Verified URLs:
-//   Login:           https://www.eydap.gr/en/MyAccount/LogIn  (EN)
-//                    https://www.eydap.gr/MyAccount/LogIn      (GR)
-//   Current account: https://www.eydap.gr/MyAccount/MyCurrentAccountAM/
-//   Pay bill (unreg):https://www.eydap.gr/MyAccount/PayUnregisteredBill/
+// Login URLs (try in order):
+//   1. https://www.eydap.gr/userLogin/         (current portal)
+//   2. https://www.eydap.gr/MyAccount/LogIn    (legacy path)
+// Bills URLs (try in order):
+//   1. https://www.eydap.gr/MyAccount/MyCurrentAccountAM/
+//   2. https://www.eydap.gr/en/myaccount/currentbilldetails
 // ASP.NET forms use standard <input name="..."> fields.
 // Login fields: customerCode / waterMeterNo + password
 // ---------------------------------------------------------------------------
@@ -473,7 +485,7 @@ function getEYDAPScraperCode(): string {
   return `
     ${BROWSER_HELPERS}
 
-    module.exports = async ({ page, context }) => {
+    export default async function({ page, context }) {
       const debug = [];
       let lastScreenshot = null;
 
@@ -481,11 +493,24 @@ function getEYDAPScraperCode(): string {
         await page.setViewport({ width: 1366, height: 768 });
         await page.setExtraHTTPHeaders({ 'Accept-Language': 'el-GR,el;q=0.9,en;q=0.8' });
 
-        // -- Navigate to login --
+        // -- Navigate to login (try current URL first, then legacy) --
         debug.push({ step: 'navigate_login' });
-        await page.goto('https://www.eydap.gr/MyAccount/LogIn', {
-          waitUntil: 'networkidle2', timeout: 40000
-        });
+        const loginUrls = [
+          'https://www.eydap.gr/userLogin/',
+          'https://www.eydap.gr/MyAccount/LogIn',
+        ];
+        let loginLoaded = false;
+        for (const loginUrl of loginUrls) {
+          try {
+            await page.goto(loginUrl, { waitUntil: 'networkidle2', timeout: 30000 });
+            loginLoaded = true;
+            debug.push({ step: 'login_url_loaded', url: loginUrl });
+            break;
+          } catch (navErr) {
+            debug.push({ step: 'login_url_failed', url: loginUrl, error: navErr.message });
+          }
+        }
+        if (!loginLoaded) throw new Error('SCRAPER_BROKEN: Could not load any EYDAP login page');
         await new Promise(r => setTimeout(r, 1500));
         lastScreenshot = await helpers.snap(page, debug, 'login_page_loaded');
 
@@ -580,11 +605,19 @@ function getEYDAPScraperCode(): string {
           throw new Error('LOGIN_FAILED: Still on login page after submit');
         }
 
-        // -- Navigate to current account / bills --
+        // -- Navigate to current account / bills (try multiple paths) --
         debug.push({ step: 'navigate_bills' });
-        await page.goto('https://www.eydap.gr/MyAccount/MyCurrentAccountAM/', {
-          waitUntil: 'networkidle2', timeout: 30000
-        });
+        const billsUrls = [
+          'https://www.eydap.gr/MyAccount/MyCurrentAccountAM/',
+          'https://www.eydap.gr/en/myaccount/currentbilldetails',
+        ];
+        for (const billsUrl of billsUrls) {
+          try {
+            await page.goto(billsUrl, { waitUntil: 'networkidle2', timeout: 20000 });
+            debug.push({ step: 'bills_url_loaded', url: billsUrl });
+            break;
+          } catch { debug.push({ step: 'bills_url_failed', url: billsUrl }); }
+        }
         await new Promise(r => setTimeout(r, 2000));
         lastScreenshot = await helpers.snap(page, debug, 'bills_page');
 
@@ -673,7 +706,7 @@ function getEYDAPScraperCode(): string {
         debug.push({ step: 'bills_extracted', count: bills.length });
         lastScreenshot = await helpers.snap(page, debug, 'extraction_done');
 
-        return { success: true, bills, debug, screenshot: lastScreenshot };
+        return { data: { success: true, bills, debug, screenshot: lastScreenshot }, type: 'application/json' };
 
       } catch (error) {
         debug.push({ step: 'error', message: error.message });
@@ -681,9 +714,9 @@ function getEYDAPScraperCode(): string {
         const code = error.message.startsWith('LOGIN_FAILED') ? 'LOGIN_FAILED'
           : error.message.startsWith('LOGIN_FORM_NOT_FOUND') ? 'SCRAPER_BROKEN'
           : 'SCRAPER_ERROR';
-        return { success: false, bills: [], error: error.message, error_code: code, debug, screenshot: lastScreenshot };
+        return { data: { success: false, bills: [], error: error.message, error_code: code, debug, screenshot: lastScreenshot }, type: 'application/json' };
       }
-    };
+    }
   `;
 }
 
@@ -706,7 +739,7 @@ function getCOSMOTEScraperCode(): string {
   return `
     ${BROWSER_HELPERS}
 
-    module.exports = async ({ page, context }) => {
+    export default async function({ page, context }) {
       const debug = [];
       let lastScreenshot = null;
 
@@ -917,7 +950,7 @@ function getCOSMOTEScraperCode(): string {
         debug.push({ step: 'bills_extracted', count: bills.length });
         lastScreenshot = await helpers.snap(page, debug, 'extraction_done');
 
-        return { success: true, bills, debug, screenshot: lastScreenshot };
+        return { data: { success: true, bills, debug, screenshot: lastScreenshot }, type: 'application/json' };
 
       } catch (error) {
         debug.push({ step: 'error', message: error.message });
@@ -925,9 +958,9 @@ function getCOSMOTEScraperCode(): string {
         const code = error.message.startsWith('LOGIN_FAILED') ? 'LOGIN_FAILED'
           : error.message.startsWith('LOGIN_FORM_NOT_FOUND') ? 'SCRAPER_BROKEN'
           : 'SCRAPER_ERROR';
-        return { success: false, bills: [], error: error.message, error_code: code, debug, screenshot: lastScreenshot };
+        return { data: { success: false, bills: [], error: error.message, error_code: code, debug, screenshot: lastScreenshot }, type: 'application/json' };
       }
-    };
+    }
   `;
 }
 
@@ -938,20 +971,22 @@ async function scrapeCOSMOTE(username: string, password: string): Promise<Scrape
 // ---------------------------------------------------------------------------
 // AADE (ΑΑΔΕ) – TaxisNet / GSIS – login.jsp + debt info
 // ---------------------------------------------------------------------------
-// Verified URLs:
-//   GSIS Login JSP:  https://www1.gsis.gr/gsisapps/soasgsisws/login.jsp
-//   myAADE:          https://www1.aade.gr/aadeapps3/myaade/
-//   Debt info:       https://www1.gsis.gr/taxisnet/info/protected/displayDebtInfo.htm
+// GSIS Login URLs (try in order):
+//   1. https://www1.gsis.gr/gsisapps/soasgsisws/login.jsp   (classic JSP)
+//   2. https://oauth2.gsis.gr/                                (new OAuth2 endpoint since Sep 2024)
+//   3. https://login.gsis.gr/                                 (alternate)
+// Debt info:
+//   - https://www1.gsis.gr/taxisnet/info/protected/displayDebtInfo.htm
+//   - https://www1.aade.gr/aadeapps3/myaade/
 // Login form uses standard JSP form POST with username (AFM) + password.
-// May trigger 2FA / OTP redirect. We detect that and return a specific
-// error code so the frontend can prompt the user.
+// May trigger 2FA / OTP redirect.
 // ---------------------------------------------------------------------------
 
 function getAADEScraperCode(): string {
   return `
     ${BROWSER_HELPERS}
 
-    module.exports = async ({ page, context }) => {
+    export default async function({ page, context }) {
       const debug = [];
       let lastScreenshot = null;
 
@@ -959,11 +994,25 @@ function getAADEScraperCode(): string {
         await page.setViewport({ width: 1366, height: 768 });
         await page.setExtraHTTPHeaders({ 'Accept-Language': 'el-GR,el;q=0.9,en;q=0.8' });
 
-        // -- Navigate to GSIS TaxisNet login --
+        // -- Navigate to GSIS TaxisNet login (try multiple endpoints) --
         debug.push({ step: 'navigate_login' });
-        await page.goto('https://www1.gsis.gr/gsisapps/soasgsisws/login.jsp', {
-          waitUntil: 'networkidle2', timeout: 40000
-        });
+        const gsisLoginUrls = [
+          'https://www1.gsis.gr/gsisapps/soasgsisws/login.jsp',
+          'https://oauth2.gsis.gr/',
+          'https://login.gsis.gr/',
+        ];
+        let gsisLoaded = false;
+        for (const gsisUrl of gsisLoginUrls) {
+          try {
+            await page.goto(gsisUrl, { waitUntil: 'networkidle2', timeout: 25000 });
+            gsisLoaded = true;
+            debug.push({ step: 'gsis_url_loaded', url: gsisUrl, redirectedTo: page.url() });
+            break;
+          } catch (navErr) {
+            debug.push({ step: 'gsis_url_failed', url: gsisUrl, error: navErr.message });
+          }
+        }
+        if (!gsisLoaded) throw new Error('SCRAPER_BROKEN: Could not load any GSIS login page');
         await new Promise(r => setTimeout(r, 1500));
         lastScreenshot = await helpers.snap(page, debug, 'gsis_login_loaded');
 
@@ -1046,7 +1095,8 @@ function getAADEScraperCode(): string {
         }
 
         // Still on login page?
-        if (currentUrl.includes('login.jsp') || currentUrl.includes('login.htm')) {
+        if (currentUrl.includes('login.jsp') || currentUrl.includes('login.htm') ||
+            currentUrl.includes('oauth2.gsis.gr') || currentUrl.includes('login.gsis.gr')) {
           const bodyText = await page.evaluate(() => document.body.innerText || '');
           const errMsg = bodyText.includes('Λάθος') || bodyText.includes('error') || bodyText.includes('λανθασμέν')
             ? 'Invalid credentials' : 'Login did not redirect';
@@ -1189,7 +1239,7 @@ function getAADEScraperCode(): string {
         debug.push({ step: 'bills_extracted', count: bills.length });
         lastScreenshot = await helpers.snap(page, debug, 'extraction_done');
 
-        return { success: true, bills, debug, screenshot: lastScreenshot };
+        return { data: { success: true, bills, debug, screenshot: lastScreenshot }, type: 'application/json' };
 
       } catch (error) {
         debug.push({ step: 'error', message: error.message });
@@ -1198,9 +1248,9 @@ function getAADEScraperCode(): string {
           : error.message.startsWith('LOGIN_FAILED') ? 'LOGIN_FAILED'
           : error.message.startsWith('LOGIN_FORM_NOT_FOUND') ? 'SCRAPER_BROKEN'
           : 'SCRAPER_ERROR';
-        return { success: false, bills: [], error: error.message, error_code: code, debug, screenshot: lastScreenshot };
+        return { data: { success: false, bills: [], error: error.message, error_code: code, debug, screenshot: lastScreenshot }, type: 'application/json' };
       }
-    };
+    }
   `;
 }
 
@@ -1211,19 +1261,20 @@ async function scrapeAADE(username: string, password: string): Promise<ScraperRe
 // ---------------------------------------------------------------------------
 // EFKA (e-ΕΦΚΑ) – TaxisNet SSO → efka portal
 // ---------------------------------------------------------------------------
-// Verified URLs:
-//   eAccess login:   https://apps.e-efka.gov.gr/eAccess/login.xhtml (JSF)
-//   Redirects to GSIS TaxisNet for SSO auth, then back to EFKA portal.
-//   After auth:      contributions / ατομικός λογαριασμός ασφαλισμένου
-// Flow: EFKA login → redirect to GSIS login.jsp → authenticate → redirect
-//       back to EFKA → show contributions/debts
+// Login URLs (try in order for fastest GSIS redirect):
+//   1. https://apps.e-efka.gov.gr/eAccess/gsis/login.xhtml  (direct GSIS redirect)
+//   2. https://apps.e-efka.gov.gr/eAccess/login.xhtml        (manual SSO button)
+// After GSIS auth, redirects back to EFKA portal.
+// Contribution pages:
+//   - https://apps.e-efka.gov.gr/eAccess/personalAccount.xhtml
+//   - https://apps.e-efka.gov.gr/eAccess/contributions.xhtml
 // ---------------------------------------------------------------------------
 
 function getEFKAScraperCode(): string {
   return `
     ${BROWSER_HELPERS}
 
-    module.exports = async ({ page, context }) => {
+    export default async function({ page, context }) {
       const debug = [];
       let lastScreenshot = null;
 
@@ -1231,22 +1282,31 @@ function getEFKAScraperCode(): string {
         await page.setViewport({ width: 1366, height: 768 });
         await page.setExtraHTTPHeaders({ 'Accept-Language': 'el-GR,el;q=0.9,en;q=0.8' });
 
-        // -- Navigate to EFKA eAccess login --
-        // This page should redirect or show a TaxisNet SSO login button.
+        // -- Navigate to EFKA → GSIS SSO --
+        // Try the direct GSIS redirect path first (auto-redirects to TaxisNet)
+        // then fall back to the manual login page with SSO button.
         debug.push({ step: 'navigate_efka' });
-        await page.goto('https://apps.e-efka.gov.gr/eAccess/login.xhtml', {
-          waitUntil: 'networkidle2', timeout: 40000
-        });
+        const efkaLoginUrls = [
+          'https://apps.e-efka.gov.gr/eAccess/gsis/login.xhtml',
+          'https://apps.e-efka.gov.gr/eAccess/login.xhtml',
+        ];
+        for (const efkaUrl of efkaLoginUrls) {
+          try {
+            await page.goto(efkaUrl, { waitUntil: 'networkidle2', timeout: 30000 });
+            debug.push({ step: 'efka_url_loaded', url: efkaUrl, redirectedTo: page.url() });
+            break;
+          } catch (navErr) {
+            debug.push({ step: 'efka_url_failed', url: efkaUrl, error: navErr.message });
+          }
+        }
         await new Promise(r => setTimeout(r, 2000));
         lastScreenshot = await helpers.snap(page, debug, 'efka_login_loaded');
 
-        // -- Look for TaxisNet SSO redirect --
-        // EFKA typically has a button/link that says "Είσοδος μέσω TaxisNet"
-        // or redirects automatically to GSIS.
+        // -- Check if we auto-redirected to GSIS, or need to click SSO button --
         const currentUrl = page.url();
         debug.push({ step: 'initial_url', url: currentUrl });
 
-        const isOnGSIS = currentUrl.includes('gsis.gr');
+        const isOnGSIS = currentUrl.includes('gsis.gr') || currentUrl.includes('oauth2.gsis');
 
         if (!isOnGSIS) {
           // Look for TaxisNet login button on EFKA page
@@ -1264,9 +1324,9 @@ function getEFKAScraperCode(): string {
           if (!taxisBtn) {
             const btnHandle = await page.evaluateHandle(() => {
               const els = [...document.querySelectorAll('a, button, input[type="submit"]')];
-              return els.find(e => /TaxisNet|Taxisnet|taxisnet|TAXISNET/i.test(e.textContent || e.value || '')) || null;
+              return els.find(e => /TaxisNet|Taxisnet|taxisnet|TAXISNET|GSIS|gsis/i.test(e.textContent || e.value || '')) || null;
             });
-            const asElement = btnHandle.asElement();
+            const asElement = btnHandle ? btnHandle.asElement() : null;
             if (asElement) {
               debug.push({ step: 'click_taxisnet_sso', method: 'text_match' });
               await Promise.all([
@@ -1286,9 +1346,8 @@ function getEFKAScraperCode(): string {
             ]);
             await new Promise(r => setTimeout(r, 2000));
           } else if (!taxisBtn) {
-            // Maybe there's a form on the EFKA page itself, or auto-redirect
+            // Last resort: navigate directly to GSIS
             debug.push({ step: 'no_taxisnet_button_found', trying: 'direct_gsis' });
-            // Navigate directly to GSIS
             await page.goto('https://www1.gsis.gr/gsisapps/soasgsisws/login.jsp', {
               waitUntil: 'networkidle2', timeout: 30000
             });
@@ -1357,7 +1416,8 @@ function getEFKAScraperCode(): string {
         const loginErr = await helpers.detectError(page);
         if (loginErr) throw new Error('LOGIN_FAILED: ' + loginErr.substring(0, 200));
 
-        if (page.url().includes('login.jsp') || page.url().includes('login.xhtml')) {
+        if (page.url().includes('login.jsp') || page.url().includes('login.xhtml') ||
+            page.url().includes('oauth2.gsis.gr') || page.url().includes('login.gsis.gr')) {
           throw new Error('LOGIN_FAILED: Did not redirect after GSIS login');
         }
 
@@ -1481,7 +1541,7 @@ function getEFKAScraperCode(): string {
         debug.push({ step: 'bills_extracted', count: bills.length });
         lastScreenshot = await helpers.snap(page, debug, 'extraction_done');
 
-        return { success: true, bills, debug, screenshot: lastScreenshot };
+        return { data: { success: true, bills, debug, screenshot: lastScreenshot }, type: 'application/json' };
 
       } catch (error) {
         debug.push({ step: 'error', message: error.message });
@@ -1490,9 +1550,9 @@ function getEFKAScraperCode(): string {
           : error.message.startsWith('LOGIN_FAILED') ? 'LOGIN_FAILED'
           : error.message.startsWith('LOGIN_FORM_NOT_FOUND') ? 'SCRAPER_BROKEN'
           : 'SCRAPER_ERROR';
-        return { success: false, bills: [], error: error.message, error_code: code, debug, screenshot: lastScreenshot };
+        return { data: { success: false, bills: [], error: error.message, error_code: code, debug, screenshot: lastScreenshot }, type: 'application/json' };
       }
-    };
+    }
   `;
 }
 
@@ -1703,7 +1763,8 @@ serve(async (req) => {
           .from("evidence")
           .upload(path, screenshotBytes, { contentType: "image/png", upsert: true });
         if (uploadData) {
-          screenshotUrl = `${supabaseUrl}/storage/v1/object/public/evidence/${path}`;
+          // Bucket is private — store the path; frontend uses signed URLs to access
+          screenshotUrl = path;
         }
       } catch {
         // Non-critical, continue
