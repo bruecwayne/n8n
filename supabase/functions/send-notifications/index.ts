@@ -173,13 +173,16 @@ serve(async (req) => {
       if (!profile?.email || !profile.notification_preferences?.email) {
         continue;
       }
+      if (!provider) {
+        continue;
+      }
 
       const subject =
         type === "d3"
-          ? `\u23F0 \u03A5\u03C0\u03B5\u03BD\u03B8\u03CD\u03BC\u03B9\u03C3\u03B7: \u039B\u03BF\u03B3\u03B1\u03C1\u03B9\u03B1\u03C3\u03BC\u03CC\u03C2 ${provider!.name_el} \u03BB\u03AE\u03B3\u03B5\u03B9 \u03C3\u03B5 3 \u03B7\u03BC\u03AD\u03C1\u03B5\u03C2`
-          : `\uD83D\uDD14 \u03A3\u03AE\u03BC\u03B5\u03C1\u03B1 \u03BB\u03AE\u03B3\u03B5\u03B9 \u03BF \u03BB\u03BF\u03B3\u03B1\u03C1\u03B9\u03B1\u03C3\u03BC\u03CC\u03C2 ${provider!.name_el}`;
+          ? `\u23F0 \u03A5\u03C0\u03B5\u03BD\u03B8\u03CD\u03BC\u03B9\u03C3\u03B7: \u039B\u03BF\u03B3\u03B1\u03C1\u03B9\u03B1\u03C3\u03BC\u03CC\u03C2 ${provider.name_el} \u03BB\u03AE\u03B3\u03B5\u03B9 \u03C3\u03B5 3 \u03B7\u03BC\u03AD\u03C1\u03B5\u03C2`
+          : `\uD83D\uDD14 \u03A3\u03AE\u03BC\u03B5\u03C1\u03B1 \u03BB\u03AE\u03B3\u03B5\u03B9 \u03BF \u03BB\u03BF\u03B3\u03B1\u03C1\u03B9\u03B1\u03C3\u03BC\u03CC\u03C2 ${provider.name_el}`;
 
-      const html = buildEmailHtml(type, profile, provider!, bill);
+      const html = buildEmailHtml(type, profile, provider, bill);
 
       const sent = await sendEmail(profile.email, subject, html);
 
@@ -197,7 +200,7 @@ serve(async (req) => {
           type: notificationType,
           channel: "email",
           title: subject,
-          body: `${provider!.name_el}: \u20AC${bill.amount.toFixed(2)} - \u03BB\u03AE\u03BE\u03B7 ${new Date(bill.due_date).toLocaleDateString("el-GR")}`,
+          body: `${provider.name_el}: \u20AC${bill.amount.toFixed(2)} - \u03BB\u03AE\u03BE\u03B7 ${new Date(bill.due_date).toLocaleDateString("el-GR")}`,
           status: "sent",
           sent_at: new Date().toISOString(),
         });

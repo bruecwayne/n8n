@@ -166,7 +166,17 @@ serve(async (req) => {
       },
     );
 
-    const syncResult = await syncResponse.json();
+    let syncResult: { success: boolean; error?: string } = {
+      success: false,
+      error: "Sync did not complete",
+    };
+    try {
+      if (syncResponse.ok) {
+        syncResult = await syncResponse.json();
+      }
+    } catch {
+      // sync-bills may have timed out or returned non-JSON (e.g. 502 HTML)
+    }
 
     return new Response(
       JSON.stringify({

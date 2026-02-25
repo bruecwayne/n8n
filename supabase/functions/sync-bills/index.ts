@@ -100,9 +100,16 @@ async function runBrowserless(
   // Browserless v2 functions return { data, type } — unwrap if needed.
   // v1 returns the plain object directly.
   if (raw && typeof raw === "object" && "data" in raw && "type" in raw) {
-    return raw.data as ScraperResult;
+    if (raw.data != null) return raw.data as ScraperResult;
   }
-  return raw as ScraperResult;
+  // Direct response (v1) or already-unwrapped v2: validate shape
+  if (raw && typeof raw.success === "boolean") {
+    return raw as ScraperResult;
+  }
+  // Completely malformed response — throw so sync job records the failure
+  throw new Error(
+    `Browserless returned unexpected response: ${JSON.stringify(raw).slice(0, 200)}`,
+  );
 }
 
 // ---------------------------------------------------------------------------
