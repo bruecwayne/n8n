@@ -17,6 +17,7 @@ async function sendEmail(
   html: string,
 ): Promise<boolean> {
   const resendApiKey = Deno.env.get("RESEND_API_KEY")!;
+  const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "FAB <notifications@fab.gr>";
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -25,7 +26,7 @@ async function sendEmail(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "FAB <notifications@fab.gr>",
+      from: fromEmail,
       to: [to],
       subject,
       html,
