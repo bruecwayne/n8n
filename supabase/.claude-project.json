@@ -1,0 +1,66 @@
+{
+  "project": {
+    "name": "FAB (Fintrack Assist Bills)",
+    "description": "Serverless backend that automatically scrapes bills from 5 Greek government/utility portals, stores them encrypted, and sends email reminders before due dates.",
+    "type": "backend",
+    "status": "v1.0 — backend complete, no frontend yet"
+  },
+  "tech_stack": {
+    "runtime": "Supabase Edge Functions (Deno/TypeScript)",
+    "database": "Supabase Postgres with RLS",
+    "scraping": "Browserless.io v2 (Puppeteer, stealth mode)",
+    "email": "Resend API",
+    "encryption": "AES-256-GCM via Web Crypto API",
+    "auth": "Supabase Auth (GoTrue, JWT)",
+    "scheduler": "pg_cron + pg_net"
+  },
+  "key_files": {
+    "start_here": [
+      "supabase/ARCHITECTURE.md",
+      "supabase/PROJECT_STRUCTURE.md",
+      "supabase/DEPLOYMENT_GUIDE.md"
+    ],
+    "core_logic": [
+      "supabase/functions/sync-bills/index.ts",
+      "supabase/functions/add-provider-account/index.ts",
+      "supabase/functions/send-notifications/index.ts",
+      "supabase/functions/trigger-daily-sync/index.ts"
+    ],
+    "database": [
+      "supabase/migrations/20240101000001_create_tables.sql",
+      "supabase/migrations/20240101000002_create_functions.sql",
+      "supabase/migrations/20240101000003_create_cron_jobs.sql",
+      "supabase/migrations/20240101000004_create_storage.sql"
+    ],
+    "config": [
+      "supabase/config.toml",
+      "supabase/.env.example",
+      "supabase/functions/import_map.json"
+    ]
+  },
+  "providers": {
+    "AADE": { "name_el": "ΑΑΔΕ/Taxisnet", "category": "tax", "auth": "GSIS/TaxisNet" },
+    "EFKA": { "name_el": "e-ΕΦΚΑ", "category": "insurance", "auth": "GSIS/TaxisNet" },
+    "DEH": { "name_el": "ΔΕΗ", "category": "electricity", "auth": "email + password" },
+    "EYDAP": { "name_el": "ΕΥΔΑΠ", "category": "water", "auth": "account + password" },
+    "COSMOTE": { "name_el": "COSMOTE", "category": "telecom", "auth": "phone + password" }
+  },
+  "environment_variables": {
+    "auto_provided": ["SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"],
+    "required_secrets": ["BROWSERLESS_URL", "BROWSERLESS_TOKEN", "ENCRYPTION_KEY", "RESEND_API_KEY"],
+    "optional_secrets": ["RESEND_FROM_EMAIL", "SCRAPER_TIMEOUT_MS"]
+  },
+  "cron_schedule": {
+    "daily_sync": "0 6 * * * (6:00 AM)",
+    "notifications_d0": "30 8 * * * (8:30 AM)",
+    "notifications_d3": "30 9 * * * (9:30 AM)",
+    "mark_overdue": "0 0 * * * (midnight)",
+    "weekly_cleanup": "0 3 * * 0 (Sunday 3 AM)"
+  },
+  "known_issues": [
+    "Greek government portals frequently change URLs — scrapers have fallback URL arrays",
+    "GSIS (TaxisNet) may require 2FA — system detects and reports this as 2FA_REQUIRED",
+    "Browserless free tier is insufficient for production use",
+    "Cron migration file (000003) has placeholders that MUST be edited before db push"
+  ]
+}
