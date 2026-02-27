@@ -1,502 +1,340 @@
-# ⚡ N8N Workflow Collection & Documentation
+# n8n Workflow Collection
 
-A professionally organized collection of **2,057 n8n workflows** with a lightning-fast documentation system that provides instant search, analysis, and browsing capabilities.
+<div align="center">
 
-> **⚠️ IMPORTANT NOTICE (Aug 14, 2025):** Repository history has been rewritten due to DMCA compliance. If you have a fork or local clone, please see [Issue 85](https://github.com/Zie619/n8n-workflows/issues/85) for instructions on syncing your copy.
-> 
-## Support My Work
+![n8n Workflows](https://img.shields.io/badge/n8n-Workflows-orange?style=for-the-badge&logo=n8n)
+![Workflows](https://img.shields.io/badge/Workflows-4343+-blue?style=for-the-badge)
+![Integrations](https://img.shields.io/badge/Integrations-365+-green?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/zie619)
 
-[![Buy Me a Coffee](https://img.shields.io/badge/-Buy%20Me%20a%20Coffee-ffdd00?logo=buy-me-a-coffee&logoColor=black&style=flat)](https://www.buymeacoffee.com/zie619)
+### The Ultimate Collection of n8n Automation Workflows
 
-If you'd like to say thanks, consider buying me a coffee—your support helps me keep improving this project!
+**[Browse Online](https://zie619.github.io/n8n-workflows)** · **[Documentation](#documentation)** · **[Contributing](#contributing)** · **[License](#license)**
 
-## 🚀 **NEW: Public Search Interface & High-Performance Documentation**
+</div>
 
-**🌐 [Browse workflows online](https://zie619.github.io/n8n-workflows) - No installation required!**
+---
 
-**Or run locally for development with 100x performance improvement:**
+<div align="center">
 
-### Option 1: Online Search (Recommended for Users)
-**🔗 Visit: [zie619.github.io/n8n-workflows](https://zie619.github.io/n8n-workflows)**
-- ⚡ **Instant access** - No setup required
-- 🔍 **Search 2,057+ workflows** directly in browser
-- 📱 **Mobile-friendly** interface
-- 🏷️ **Category filtering** across 15 categories
-- 📥 **Direct download** of workflow JSON files
+<a href="https://github.com/Trusera/ai-bom">
+  <img src="https://raw.githubusercontent.com/Trusera/ai-bom/main/assets/logo.png" alt="AI-BOM Logo" width="100" />
+</a>
 
-### Option 2: Local Development System
+<h2>NEW: Scan Your n8n Workflows for AI Security Risks</h2>
+
+<a href="https://github.com/Trusera/ai-bom">
+  <img src="https://img.shields.io/badge/AI--BOM-Scan%20Now-ff4444?style=for-the-badge&logoColor=white" alt="AI-BOM" />
+</a>
+<a href="https://github.com/Trusera/ai-bom">
+  <img src="https://img.shields.io/badge/Open%20Source-Apache%202.0-blue?style=for-the-badge" alt="Open Source" />
+</a>
+<a href="https://github.com/Trusera/ai-bom">
+  <img src="https://img.shields.io/badge/First%20n8n%20AI%20Scanner-Ever-brightgreen?style=for-the-badge" alt="First Ever" />
+</a>
+
+</div>
+
+<table>
+<tr>
+<td width="65%">
+
+### Your workflows contain AI — do you know what's hiding in them?
+
+We built **[AI-BOM](https://github.com/Trusera/ai-bom)** because we scanned our own 4,343 workflows and found **hardcoded API keys, unauthenticated AI agents, and MCP clients connecting to unknown servers** — all invisible to existing security tools.
+
+**AI-BOM is the first and only tool that scans n8n workflows for AI security risks.**
+
 ```bash
+pip install ai-bom
+ai-bom scan ./workflows/
+```
+
+One command finds every AI Agent node, LLM integration, MCP client, hardcoded credential, and dangerous tool combination — then gives you a risk score and a compliance-ready report.
+
+**EU AI Act deadline: August 2025.** You need an AI inventory.
+
+<a href="https://github.com/Trusera/ai-bom"><strong>Get AI-BOM (free & open source) &rarr;</strong></a>
+
+</td>
+<td width="35%" align="center">
+
+<a href="https://github.com/Trusera/ai-bom">
+  <img src="https://raw.githubusercontent.com/Trusera/ai-bom/main/assets/maskot.png" alt="AI-BOM Mascot" width="220" />
+</a>
+
+<br />
+
+<sub><strong>AI-BOM</strong> by <a href="https://trusera.dev">Trusera</a></sub>
+<br />
+<sub>Securing the Agentic Service Mesh</sub>
+
+</td>
+</tr>
+</table>
+
+<details>
+<summary><strong>What does AI-BOM detect in n8n workflows? (click to expand)</strong></summary>
+
+<br />
+
+| Risk | Severity | What it finds |
+|------|----------|---------------|
+| **AI Agent nodes** | CRITICAL | Agents connected to LLMs with tool access — can execute code |
+| **Hardcoded credentials** | CRITICAL | API keys in workflow JSON instead of credential store |
+| **Dangerous tool combos** | CRITICAL | Agents with Code Execution + HTTP Request = RCE risk |
+| **MCP clients** | HIGH | Model Context Protocol connections to external servers |
+| **Unauthenticated webhooks** | HIGH | Webhook triggers exposed to the internet without auth |
+| **Agent chains** | HIGH | Execute Workflow linking agents without input validation |
+
+Beyond n8n, AI-BOM also scans **source code** (Python, JS, TS, Java, Go, Rust, Ruby), **Docker configs**, **cloud infrastructure** (Terraform, CloudFormation), and **network endpoints** — 21+ AI SDKs detected across 7 languages.
+
+Output formats: **CycloneDX SBOM** | **SARIF** (GitHub Code Scanning) | **HTML Dashboard** | **Markdown** | **JSON**
+
+</details>
+
+---
+
+## What's New
+
+### Latest Updates (November 2025)
+- **Enhanced Security**: Full security audit completed, all CVEs resolved
+- **Docker Support**: Multi-platform builds for linux/amd64 and linux/arm64
+- **GitHub Pages**: Live searchable interface at [zie619.github.io/n8n-workflows](https://zie619.github.io/n8n-workflows)
+- **Performance**: 100x faster search with SQLite FTS5 integration
+- **Modern UI**: Completely redesigned interface with dark/light mode
+
+---
+
+## Quick Access
+
+### Use Online (No Installation)
+Visit **[zie619.github.io/n8n-workflows](https://zie619.github.io/n8n-workflows)** for instant access to:
+- **Smart Search** — Find workflows instantly
+- **15+ Categories** — Browse by use case
+- **Mobile Ready** — Works on any device
+- **Direct Downloads** — Get workflow JSONs instantly
+
+---
+
+## Features
+
+<table>
+<tr>
+<td width="50%">
+
+### By The Numbers
+- **4,343** Production-Ready Workflows
+- **365** Unique Integrations
+- **29,445** Total Nodes
+- **15** Organized Categories
+- **100%** Import Success Rate
+
+</td>
+<td width="50%">
+
+### Performance
+- **< 100ms** Search Response
+- **< 50MB** Memory Usage
+- **700x** Smaller Than v1
+- **10x** Faster Load Times
+- **40x** Less RAM Usage
+
+</td>
+</tr>
+</table>
+
+---
+
+## Local Installation
+
+### Prerequisites
+- Python 3.9+
+- pip (Python package manager)
+- 100MB free disk space
+
+### Quick Start
+```bash
+# Clone the repository
+git clone https://github.com/Zie619/n8n-workflows.git
+cd n8n-workflows
+
 # Install dependencies
 pip install -r requirements.txt
 
-# Start the fast API server
+# Start the server
 python run.py
 
 # Open in browser
-http://localhost:8000
+# http://localhost:8000
 ```
 
-**Features:**
-- ⚡ **Sub-100ms response times** with SQLite FTS5 search
-- 🔍 **Instant full-text search** with advanced filtering
-- 📱 **Responsive design** - works perfectly on mobile
-- 🌙 **Dark/light themes** with system preference detection
-- 📊 **Live statistics** - 365 unique integrations, 29,445 total nodes
-- 🎯 **Smart categorization** by trigger type and complexity
-- 🎯 **Use case categorization** by service name mapped to categories
-- 📄 **On-demand JSON viewing** and download
-- 🔗 **Mermaid diagram generation** for workflow visualization
-- 🔄 **Real-time workflow naming** with intelligent formatting
-
-### Performance Comparison
-
-| Metric | Old System | New System | Improvement |
-|--------|------------|------------|-------------|
-| **File Size** | 71MB HTML | <100KB | **700x smaller** |
-| **Load Time** | 10+ seconds | <1 second | **10x faster** |
-| **Search** | Client-side only | Full-text with FTS5 | **Instant** |
-| **Memory Usage** | ~2GB RAM | <50MB RAM | **40x less** |
-| **Mobile Support** | Poor | Excellent | **Fully responsive** |
-
----
-
-## 📂 Repository Organization
-
-### Workflow Collection
-- **2,057 workflows** with meaningful, searchable names
-- **365 unique integrations** across popular platforms
-- **29,445 total nodes** with professional categorization
-- **Quality assurance** - All workflows analyzed and categorized
-
-### Advanced Naming System ✨
-Our intelligent naming system converts technical filenames into readable titles:
-- **Before**: `2051_Telegram_Webhook_Automation_Webhook.json`
-- **After**: `Telegram Webhook Automation`
-- **100% meaningful names** with smart capitalization
-- **Automatic integration detection** from node analysis
-
-### Use Case Category ✨
-
-The search interface includes a dropdown filter that lets you browse 2,057+ workflows by category.
-
-The system includes an automated categorization feature that organizes workflows by service categories to make them easier to discover and filter.
-
-### How Categorization Works
-
-1. **Run the categorization script**
-   ```
-   python create_categories.py
-   ```
-
-2. **Service Name Recognition**
-   The script analyzes each workflow JSON filename to identify recognized service names (e.g., "Twilio", "Slack", "Gmail", etc.)
-
-3. **Category Mapping**
-   Each recognized service name is matched to its corresponding category using the definitions in `context/def_categories.json`. For example:
-   - Twilio → Communication & Messaging
-   - Gmail → Communication & Messaging  
-   - Airtable → Data Processing & Analysis
-   - Salesforce → CRM & Sales
-
-4. **Search Categories Generation**
-   The script produces a `search_categories.json` file that contains the categorized workflow data
-
-5. **Filter Interface**
-   Users can then filter workflows by category in the search interface, making it easier to find workflows for specific use cases
-
-### Available Categories
-
-The categorization system includes the following main categories:
-- AI Agent Development
-- Business Process Automation
-- Cloud Storage & File Management
-- Communication & Messaging
-- Creative Content & Video Automation
-- Creative Design Automation
-- CRM & Sales
-- Data Processing & Analysis
-- E-commerce & Retail
-- Financial & Accounting
-- Marketing & Advertising Automation
-- Project Management
-- Social Media Management
-- Technical Infrastructure & DevOps
-- Web Scraping & Data Extraction
-
-### Contribute Categories
-
-You can help expand the categorization by adding more service-to-category mappings (e.g., Twilio → Communication & Messaging) in context/defs_categories.json.
-
-Many workflow JSON files are conveniently named with the service name, often separated by underscores (_).
-
-
----
-
-## 🛠 Usage Instructions
-
-### Option 1: Modern Fast System (Recommended)
+### Docker Installation
 ```bash
-# Clone repository
-git clone <repo-url>
-cd n8n-workflows
+# Using Docker Hub
+docker run -p 8000:8000 zie619/n8n-workflows:latest
 
-# Install Python dependencies
-pip install -r requirements.txt
-
-# Start the documentation server
-python run.py
-
-# Browse workflows at http://localhost:8000
-# - Instant search across 2,057 workflows
-# - Professional responsive interface
-# - Real-time workflow statistics
-```
-
-### Option 2: Development Mode
-```bash
-# Start with auto-reload for development
-python run.py --dev
-
-# Or specify custom host/port
-python run.py --host 0.0.0.0 --port 3000
-
-# Force database reindexing
-python run.py --reindex
-```
-
-### Import Workflows into n8n
-```bash
-# Use the Python importer (recommended)
-python import_workflows.py
-
-# Or manually import individual workflows:
-# 1. Open your n8n Editor UI
-# 2. Click menu (☰) → Import workflow
-# 3. Choose any .json file from the workflows/ folder
-# 4. Update credentials/webhook URLs before running
+# Or build locally
+docker build -t n8n-workflows .
+docker run -p 8000:8000 n8n-workflows
 ```
 
 ---
 
-## 📊 Workflow Statistics
+## Documentation
 
-### Current Collection Stats
-- **Total Workflows**: 2,057 automation workflows
-- **Active Workflows**: 215 (10.5% active rate)
-- **Total Nodes**: 29,528 (avg 14.4 nodes per workflow)
-- **Unique Integrations**: 367 different services and APIs
-- **Database**: SQLite with FTS5 full-text search
+### API Endpoints
 
-### Trigger Distribution
-- **Complex**: 832 workflows (40.4%) - Multi-trigger systems
-- **Webhook**: 521 workflows (25.3%) - API-triggered automations  
-- **Manual**: 478 workflows (23.2%) - User-initiated workflows
-- **Scheduled**: 226 workflows (11.0%) - Time-based executions
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Web interface |
+| `/api/search` | GET | Search workflows |
+| `/api/stats` | GET | Repository statistics |
+| `/api/workflow/{id}` | GET | Get workflow JSON |
+| `/api/categories` | GET | List all categories |
+| `/api/export` | GET | Export workflows |
 
-### Complexity Analysis
-- **Low (≤5 nodes)**: ~35% - Simple automations
-- **Medium (6-15 nodes)**: ~45% - Standard workflows
-- **High (16+ nodes)**: ~20% - Complex enterprise systems
-
-### Popular Integrations
-Top services by usage frequency:
-- **Communication**: Telegram, Discord, Slack, WhatsApp
-- **Cloud Storage**: Google Drive, Google Sheets, Dropbox
-- **Databases**: PostgreSQL, MySQL, MongoDB, Airtable
-- **AI/ML**: OpenAI, Anthropic, Hugging Face
-- **Development**: HTTP Request, Webhook, GraphQL
+### Search Features
+- **Full-text search** across names, descriptions, and nodes
+- **Category filtering** (Marketing, Sales, DevOps, etc.)
+- **Complexity filtering** (Low, Medium, High)
+- **Trigger type filtering** (Webhook, Schedule, Manual, etc.)
+- **Service filtering** (365+ integrations)
 
 ---
 
-## 🔍 Advanced Search Features
+## Architecture
 
-### Smart Search Categories
-Our system automatically categorizes workflows into 15 main categories:
+```mermaid
+graph LR
+    A[User] --> B[Web Interface]
+    B --> C[FastAPI Server]
+    C --> D[SQLite FTS5]
+    D --> E[Workflow Database]
+    C --> F[Static Files]
+    F --> G[Workflow JSONs]
+```
 
-#### Available Categories:
-- **AI Agent Development**: OpenAI, Anthropic, Hugging Face, CalcsLive
-- **Business Process Automation**: Workflow utilities, scheduling, data processing
-- **Cloud Storage & File Management**: Google Drive, Dropbox, OneDrive, Box
-- **Communication & Messaging**: Telegram, Discord, Slack, WhatsApp, Email
-- **Creative Content & Video Automation**: YouTube, Vimeo, content creation
-- **Creative Design Automation**: Canva, Figma, image processing
-- **CRM & Sales**: Salesforce, HubSpot, Pipedrive, customer management
-- **Data Processing & Analysis**: Database operations, analytics, data transformation
-- **E-commerce & Retail**: Shopify, Stripe, PayPal, online stores
-- **Financial & Accounting**: Financial tools, payment processing, accounting
-- **Marketing & Advertising Automation**: Email marketing, campaigns, lead generation
-- **Project Management**: Jira, Trello, Asana, task management
-- **Social Media Management**: LinkedIn, Twitter/X, Facebook, Instagram
-- **Technical Infrastructure & DevOps**: GitHub, deployment, monitoring
-- **Web Scraping & Data Extraction**: HTTP requests, webhooks, data collection
+### Tech Stack
+- **Backend**: Python, FastAPI, SQLite with FTS5
+- **Frontend**: Vanilla JS, Tailwind CSS
+- **Database**: SQLite with Full-Text Search
+- **Deployment**: Docker, GitHub Actions, GitHub Pages
+- **Security**: Trivy scanning, CORS protection, Input validation
 
-### API Usage Examples
-```bash
-# Search workflows by text
-curl "http://localhost:8000/api/workflows?q=telegram+automation"
+---
 
-# Filter by trigger type and complexity
-curl "http://localhost:8000/api/workflows?trigger=Webhook&complexity=high"
+## Repository Structure
 
-# Find all messaging workflows
-curl "http://localhost:8000/api/workflows/category/messaging"
-
-# Get database statistics
-curl "http://localhost:8000/api/stats"
-
-# Browse available categories
-curl "http://localhost:8000/api/categories"
+```
+n8n-workflows/
+├── workflows/           # 4,343 workflow JSON files
+│   └── [category]/     # Organized by integration
+├── docs/               # GitHub Pages site
+├── src/                # Python source code
+├── scripts/            # Utility scripts
+├── api_server.py       # FastAPI application
+├── run.py              # Server launcher
+├── workflow_db.py      # Database manager
+└── requirements.txt    # Python dependencies
 ```
 
 ---
 
-## 🏗 Technical Architecture
+## Contributing
 
-### Modern Stack
-- **SQLite Database** - FTS5 full-text search with 365 indexed integrations
-- **FastAPI Backend** - RESTful API with automatic OpenAPI documentation
-- **Responsive Frontend** - Modern HTML5 with embedded CSS/JavaScript
-- **Smart Analysis** - Automatic workflow categorization and naming
+We love contributions! Here's how you can help:
 
-### Key Features
-- **Change Detection** - MD5 hashing for efficient re-indexing
-- **Background Processing** - Non-blocking workflow analysis
-- **Compressed Responses** - Gzip middleware for optimal speed
-- **Error Handling** - Graceful degradation and comprehensive logging
-- **Mobile Optimization** - Touch-friendly interface design
-
-### Database Performance
-```sql
--- Optimized schema for lightning-fast queries
-CREATE TABLE workflows (
-    id INTEGER PRIMARY KEY,
-    filename TEXT UNIQUE,
-    name TEXT,
-    active BOOLEAN,
-    trigger_type TEXT,
-    complexity TEXT,
-    node_count INTEGER,
-    integrations TEXT,  -- JSON array of 365 unique services
-    description TEXT,
-    file_hash TEXT,     -- MD5 for change detection
-    analyzed_at TIMESTAMP
-);
-
--- Full-text search with ranking
-CREATE VIRTUAL TABLE workflows_fts USING fts5(
-    filename, name, description, integrations, tags,
-    content='workflows', content_rowid='id'
-);
-```
-
----
-
-## 🔧 Setup & Requirements
-
-### System Requirements
-- **Python 3.7+** - For running the documentation system
-- **Modern Browser** - Chrome, Firefox, Safari, Edge
-- **50MB Storage** - For SQLite database and indexes
-- **n8n Instance** - For importing and running workflows
-
-### Installation
-```bash
-# Clone repository
-git clone <repo-url>
-cd n8n-workflows
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Start documentation server
-python run.py
-
-# Access at http://localhost:8000
-```
+### Ways to Contribute
+- **Report bugs** via [Issues](https://github.com/Zie619/n8n-workflows/issues)
+- **Suggest features** in [Discussions](https://github.com/Zie619/n8n-workflows/discussions)
+- **Improve documentation**
+- **Submit workflow fixes**
+- **Star the repository**
 
 ### Development Setup
 ```bash
-# Create virtual environment
-python3 -m venv .venv
-source .venv/bin/activate  # Linux/Mac
-# or .venv\Scripts\activate  # Windows
+# Fork and clone
+git clone https://github.com/YOUR_USERNAME/n8n-workflows.git
 
-# Install dependencies
-pip install -r requirements.txt
+# Create branch
+git checkout -b feature/amazing-feature
 
-# Run with auto-reload for development
-python api_server.py --reload
+# Make changes and test
+python run.py --debug
 
-# Force database reindexing
-python workflow_db.py --index --force
+# Commit and push
+git add .
+git commit -m "feat: add amazing feature"
+git push origin feature/amazing-feature
+
+# Open PR
 ```
 
 ---
 
-## 📋 Naming Convention
+## Security
 
-### Intelligent Formatting System
-Our system automatically converts technical filenames to user-friendly names:
+### Security Features
+- Path traversal protection
+- Input validation & sanitization
+- CORS protection
+- Rate limiting
+- Docker security hardening
+- Non-root container user
+- Regular security scanning
 
-```bash
-# Automatic transformations:
-2051_Telegram_Webhook_Automation_Webhook.json → "Telegram Webhook Automation"
-0250_HTTP_Discord_Import_Scheduled.json → "HTTP Discord Import Scheduled"  
-0966_OpenAI_Data_Processing_Manual.json → "OpenAI Data Processing Manual"
-```
-
-### Technical Format
-```
-[ID]_[Service1]_[Service2]_[Purpose]_[Trigger].json
-```
-
-### Smart Capitalization Rules
-- **HTTP** → HTTP (not Http)
-- **API** → API (not Api)  
-- **webhook** → Webhook
-- **automation** → Automation
-- **scheduled** → Scheduled
+### Reporting Security Issues
+Please report security vulnerabilities to the maintainers via [Security Advisory](https://github.com/Zie619/n8n-workflows/security/advisories/new).
 
 ---
 
-## 🚀 API Documentation
+## License
 
-### Core Endpoints
-- `GET /` - Main workflow browser interface
-- `GET /api/stats` - Database statistics and metrics
-- `GET /api/workflows` - Search with filters and pagination
-- `GET /api/workflows/{filename}` - Detailed workflow information
-- `GET /api/workflows/{filename}/download` - Download workflow JSON
-- `GET /api/workflows/{filename}/diagram` - Generate Mermaid diagram
-
-### Advanced Search
-- `GET /api/workflows/category/{category}` - Search by service category
-- `GET /api/categories` - List all available categories
-- `GET /api/integrations` - Get integration statistics
-- `POST /api/reindex` - Trigger background reindexing
-
-### Response Examples
-```json
-// GET /api/stats
-{
-  "total": 2053,
-  "active": 215,
-  "inactive": 1838,
-  "triggers": {
-    "Complex": 831,
-    "Webhook": 519,
-    "Manual": 477,
-    "Scheduled": 226
-  },
-  "total_nodes": 29445,
-  "unique_integrations": 365
-}
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🤝 Contributing
+## Support
 
-**🎉 This project solves [Issue #84](https://github.com/Zie619/n8n-workflows/issues/84) - providing online access to workflows without requiring local setup!**
+If you find this project helpful, please consider:
 
-### Adding New Workflows
-1. **Export workflow** as JSON from n8n
-2. **Name descriptively** following the established pattern: `[ID]_[Service]_[Purpose]_[Trigger].json`
-3. **Add to workflows/** directory (create service folder if needed)
-4. **Remove sensitive data** (credentials, personal URLs)
-5. **Add tags** for better searchability (calculation, automation, etc.)
-6. **GitHub Actions automatically** updates the public search interface
+<div align="center">
 
-### Quality Standards
-- ✅ Workflow must be functional and tested
-- ✅ Remove all credentials and sensitive data
-- ✅ Follow naming convention for consistency
-- ✅ Verify compatibility with recent n8n versions
-- ✅ Include meaningful description or comments
-- ✅ Add relevant tags for search optimization
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/zie619)
+[![Star on GitHub](https://img.shields.io/badge/Star%20on%20GitHub-181717?style=for-the-badge&logo=github)](https://github.com/Zie619/n8n-workflows)
 
-### Custom Node Workflows
-- ✅ Include npm package links in descriptions
-- ✅ Document custom node requirements
-- ✅ Add installation instructions
-- ✅ Use descriptive tags (like CalcsLive example)
-
-### Reindexing (for local development)
-```bash
-# Force database reindexing after adding workflows
-python run.py --reindex
-
-# Or update search index only
-python scripts/generate_search_index.py
-```
+</div>
 
 ---
 
-## ⚠️ Important Notes
+<div align="center">
 
-### Security & Privacy
-- **Review before use** - All workflows shared as-is for educational purposes
-- **Update credentials** - Replace API keys, tokens, and webhooks
-- **Test safely** - Verify in development environment first
-- **Check permissions** - Ensure proper access rights for integrations
+![GitHub stars](https://img.shields.io/github/stars/Zie619/n8n-workflows?style=social)
+![GitHub forks](https://img.shields.io/github/forks/Zie619/n8n-workflows?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/Zie619/n8n-workflows?style=social)
+![GitHub issues](https://img.shields.io/github/issues/Zie619/n8n-workflows)
+![GitHub last commit](https://img.shields.io/github/last-commit/Zie619/n8n-workflows)
 
-### Compatibility
-- **n8n Version** - Compatible with n8n 1.0+ (most workflows)
-- **Community Nodes** - Some workflows may require additional node installations
-- **API Changes** - External services may have updated their APIs since creation
-- **Dependencies** - Verify required integrations before importing
+</div>
 
 ---
 
-## 📚 Resources & References
+<div align="center">
 
-### Workflow Sources
-This comprehensive collection includes workflows from:
-- **Official n8n.io** - Documentation and community examples
-- **GitHub repositories** - Open source community contributions  
-- **Blog posts & tutorials** - Real-world automation patterns
-- **User submissions** - Tested and verified workflows
-- **Enterprise use cases** - Business process automations
+**Star us on GitHub — it motivates us a lot!**
 
-### Learn More
-- [n8n Documentation](https://docs.n8n.io/) - Official documentation
-- [n8n Community](https://community.n8n.io/) - Community forum and support
-- [Workflow Templates](https://n8n.io/workflows/) - Official template library
-- [Integration Docs](https://docs.n8n.io/integrations/) - Service-specific guides
+Made with care by [Zie619](https://github.com/Zie619) and [contributors](https://github.com/Zie619/n8n-workflows/graphs/contributors)
 
----
+<br />
 
-## 🏆 Project Achievements
+<a href="https://github.com/Trusera/ai-bom">
+  <img src="https://raw.githubusercontent.com/Trusera/ai-bom/main/assets/logo.png" alt="AI-BOM" width="50" />
+</a>
 
-### Repository Transformation
-- **2,053 workflows** professionally organized and named
-- **365 unique integrations** automatically detected and categorized
-- **100% meaningful names** (improved from basic filename patterns)
-- **Zero data loss** during intelligent renaming process
-- **Advanced search** with 15 service categories
+**[AI-BOM](https://github.com/Trusera/ai-bom)** — Discover every AI agent, model, and API hiding in your infrastructure.
+<br />
+Open source by **[Trusera](https://trusera.dev)** — Securing the Agentic Service Mesh.
 
-### Performance Revolution
-- **Sub-100ms search** with SQLite FTS5 full-text indexing
-- **Instant filtering** across 29,445 workflow nodes
-- **Mobile-optimized** responsive design for all devices
-- **Real-time statistics** with live database queries
-- **Professional interface** with modern UX principles
-
-### System Reliability
-- **Robust error handling** with graceful degradation
-- **Change detection** for efficient database updates
-- **Background processing** for non-blocking operations
-- **Comprehensive logging** for debugging and monitoring
-- **Production-ready** with proper middleware and security
-
----
-
-*This repository represents the most comprehensive and well-organized collection of n8n workflows available, featuring cutting-edge search technology and professional documentation that makes workflow discovery and usage a delightful experience.*
-
-**🎯 Perfect for**: Developers, automation engineers, business analysts, and anyone looking to streamline their workflows with proven n8n automations.
-
----
-
-[中文](./README_ZH.md)
-
-
+</div>

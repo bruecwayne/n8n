@@ -1,15 +1,9 @@
-name: Deploy GitHub Pages
+name: Deploy GitHub Pages (Legacy - Disabled)
 
+# This workflow is disabled - using pages-deploy.yml instead
+# The docs folder already contains pre-built static files
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'workflows/**'
-      - 'docs/**'
-      - 'scripts/**'
-      - 'workflow_db.py'
-      - 'create_categories.py'
-  workflow_dispatch:  # Allow manual triggering
+  workflow_dispatch:  # Only allow manual triggering
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -28,10 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
@@ -55,10 +49,10 @@ jobs:
           python scripts/generate_search_index.py
 
       - name: Setup Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: './docs'
 
